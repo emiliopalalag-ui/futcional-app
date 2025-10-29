@@ -1,0 +1,122 @@
+<!-- MENÚ IZQUIERDO -->
+<ion-menu contentId="main-content" type="overlay">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-title>Menú Principal</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content class="ion-padding">
+    <ion-list lines="none" class="menu-list">
+      <ion-menu-toggle auto-hide="true">
+        <ion-item button (click)="navigateTo('home')">
+          <ion-icon name="home-outline" slot="start"></ion-icon>
+          <ion-label>Inicio</ion-label>
+        </ion-item>
+
+        <ion-item button (click)="navigateTo('usuarios')">
+          <ion-icon name="people-outline" slot="start"></ion-icon>
+          <ion-label>Usuarios</ion-label>
+        </ion-item>
+
+        <ion-item button (click)="navigateTo('roles')">
+          <ion-icon name="id-card-outline" slot="start"></ion-icon>
+          <ion-label>Roles</ion-label>
+        </ion-item>
+
+        <ion-item button (click)="navigateTo('entrenamientos')">
+          <ion-icon name="barbell-outline" slot="start"></ion-icon>
+          <ion-label>Entrenamientos</ion-label>
+        </ion-item>
+
+        <ion-item button (click)="navigateTo('inscripciones')">
+          <ion-icon name="reader-outline" slot="start"></ion-icon>
+          <ion-label>Inscripciones</ion-label>
+        </ion-item>
+
+        <ion-item button (click)="navigateTo('actividades')">
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          <ion-label>Actividades</ion-label>
+        </ion-item>
+
+        <ion-item button (click)="navigateTo('informes')">
+          <ion-icon name="document-text-outline" slot="start"></ion-icon>
+          <ion-label>Informes</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+    </ion-list>
+  </ion-content>
+
+  <ion-footer>
+    <ion-toolbar color="light">
+      <ion-buttons class="menu-footer-buttons">
+        <ion-button fill="clear" (click)="goToProfile()">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          Perfil
+        </ion-button>
+        <ion-button fill="clear" color="danger" (click)="logout()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Salir
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>
+</ion-menu>
+
+<!-- CONTENIDO PRINCIPAL -->
+<div id="main-content">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+
+      <ion-title>{{ pageTitle }}</ion-title>
+
+      <ion-buttons slot="end">
+        <ion-button id="user-menu-btn" fill="clear">
+          <ion-avatar class="avatar-btn">
+            <img *ngIf="photoURL; else initialsTpl" [src]="photoURL" alt="user" />
+          </ion-avatar>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- POPOVER -->
+  <ion-popover trigger="user-menu-btn" triggerAction="click">
+    <ng-template>
+      <ion-content class="popover-content">
+        <div class="user-box">
+          <ion-avatar class="avatar-pop">
+            <img *ngIf="photoURL; else initialsTpl" [src]="photoURL" alt="user" />
+          </ion-avatar>
+          <div class="user-data">
+            <div class="name">{{ displayName || 'Usuario' }}</div>
+            <div class="email">{{ email || '' }}</div>
+          </div>
+        </div>
+
+        <ion-list lines="none">
+          <ion-item button (click)="goToProfile()">
+            <ion-icon name="person-outline" slot="start"></ion-icon>
+            <ion-label>Perfil</ion-label>
+          </ion-item>
+          <ion-item button (click)="logout()">
+            <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
+            <ion-label color="danger">Cerrar sesión</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-popover>
+
+  <!-- Aquí carga el contenido de la página -->
+  <ion-content class="ion-padding">
+    <router-outlet></router-outlet>
+  </ion-content>
+</div>
+
+<ng-template #initialsTpl>
+  <div class="initials">{{ initials }}</div>
+</ng-template>

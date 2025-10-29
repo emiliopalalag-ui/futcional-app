@@ -1,0 +1,7 @@
+{
+  "name": "futcional",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

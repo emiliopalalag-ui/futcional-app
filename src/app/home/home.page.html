@@ -1,0 +1,75 @@
+<ion-app>
+  <!-- Menú lateral -->
+  <ion-menu side="start" contentId="main-content">
+    <ion-header>
+      <ion-toolbar color="primary">
+        <ion-title>Centro FUTcional</ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <ion-list>
+        <ion-menu-toggle auto-hide="false">
+          <ion-item routerLink="/usuarios">
+            <ion-icon name="people-outline" slot="start"></ion-icon>
+            <ion-label>Usuarios</ion-label>
+          </ion-item>
+
+          <ion-item routerLink="/roles">
+            <ion-icon name="key-outline" slot="start"></ion-icon>
+            <ion-label>Roles</ion-label>
+          </ion-item>
+
+          <ion-item routerLink="/entrenamientos">
+            <ion-icon name="barbell-outline" slot="start"></ion-icon>
+            <ion-label>Entrenamientos</ion-label>
+          </ion-item>
+
+          <ion-item routerLink="/inscripciones">
+            <ion-icon name="clipboard-outline" slot="start"></ion-icon>
+            <ion-label>Inscripciones</ion-label>
+          </ion-item>
+
+          <ion-item routerLink="/actividades">
+            <ion-icon name="calendar-outline" slot="start"></ion-icon>
+            <ion-label>Actividades</ion-label>
+          </ion-item>
+
+          <ion-item routerLink="/pagos">
+            <ion-icon name="cash-outline" slot="start"></ion-icon>
+            <ion-label>Pagos</ion-label>
+          </ion-item>
+
+          <ion-item routerLink="/informes">
+            <ion-icon name="analytics-outline" slot="start"></ion-icon>
+            <ion-label>Informes</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </ion-list>
+    </ion-content>
+  </ion-menu>
+
+  <!-- Contenido principal -->
+  <div id="main-content">
+    <ion-header>
+      <ion-toolbar color="light">
+        <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
+        <ion-title>Panel Administrativo</ion-title>
+        <ion-buttons slot="end">
+          <ion-button routerLink="/perfil">
+            <ion-icon name="person-circle-outline"></ion-icon>
+          </ion-button>
+          <ion-button (click)="logout()">
+            <ion-icon name="log-out-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+      <router-outlet></router-outlet>
+    </ion-content>
+  </div>
+</ion-app>
