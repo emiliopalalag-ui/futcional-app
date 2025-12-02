@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { FirebaseService } from './firebase.service';
 
-describe('Firebase', () => {
+describe('FirebaseService', () => {
   let service: FirebaseService;
 
   beforeEach(() => {

@@ -1,13 +1,319 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>inscripciones</ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Gestión de Inscripciones</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">inscripciones</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Opciones</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <ion-button expand="block" color="success" shape="round" (click)="abrirModalAgregar()">
+        Nueva Inscripción
+      </ion-button>
+
+      <ion-button expand="block" color="warning" shape="round" (click)="abrirModalEditar()">
+        Modificar Inscripción
+      </ion-button>
+
+      <ion-button expand="block" color="danger" shape="round" (click)="abrirModalEliminar()">
+        Suspender Inscripción
+      </ion-button>
+
+   <ion-button expand="block" color="medium" shape="round" (click)="abrirModalLista()">
+  <ion-icon slot="start" name="list-outline"></ion-icon>
+  Listar Inscripciones
+</ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- ================================================= -->
+  <!-- MODAL AGREGAR -->
+  <!-- ================================================= -->
+  <ion-modal [isOpen]="modalAgregar" (willDismiss)="cerrarModalAgregar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="success">
+          <ion-title>Nueva Inscripción</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalAgregar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <h2 class="titulo-modal">Datos de la inscripción</h2>
+
+        <ion-list class="formulario">
+
+          <!-- FECHA -->
+          <ion-item>
+            <ion-label>Fecha y hora</ion-label>
+            <ion-datetime-button datetime="fechaHoraAgg"></ion-datetime-button>
+          </ion-item>
+
+          <ion-modal [keepContentsMounted]="true">
+            <ng-template>
+              <ion-datetime
+                id="fechaHoraAgg"
+                presentation="date-time"
+                hour-cycle="h23"
+                locale="es-BO"
+                (ionChange)="seleccionarFecha($event)">
+              </ion-datetime>
+            </ng-template>
+          </ion-modal>
+
+          <!-- MOSTRAR FECHAS -->
+          <ion-item lines="none">
+            <ion-label>
+              <b>Inicio:</b> {{ formatearFecha(nuevo.fecha_inicio) }} <br>
+              <b>Fin:</b> {{ formatearFecha(nuevo.fecha_fin) }}
+            </ion-label>
+          </ion-item>
+
+          <!-- ESTADO -->
+          <ion-item>
+            <ion-label>Estado</ion-label>
+            <ion-select [(ngModel)]="nuevo.estado">
+              <ion-select-option value="Activo">Activo</ion-select-option>
+              <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+              <ion-select-option value="Suspendido">Suspendido</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- ENTRENAMIENTO -->
+          <ion-item>
+            <ion-label>Entrenamiento</ion-label>
+            <ion-select 
+              [(ngModel)]="nuevo.idEntrenamiento" 
+              interface="popover"
+              (ionChange)="filtrarAtletas($event.detail.value)">
+
+              <ion-select-option *ngFor="let e of entrenamientos" [value]="e.id">
+                {{ e.nombre }} — {{ e.idEntrenador?.nombre }} {{ e.idEntrenador?.apellido }}
+              </ion-select-option>
+
+            </ion-select>
+          </ion-item>
+
+          <!-- ATLETA -->
+          <ion-item>
+            <ion-label>Atleta</ion-label>
+            <ion-select [(ngModel)]="nuevo.idAtleta" interface="popover">
+              <ion-select-option *ngFor="let a of atletasFiltrados" [value]="a.id">
+                {{ a.nombre }} {{ a.apellido }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <!-- OBSERVACIONES -->
+          <ion-item>
+            <ion-label position="floating">Observaciones</ion-label>
+            <ion-textarea [(ngModel)]="nuevo.observaciones"></ion-textarea>
+          </ion-item>
+
+          <!-- MONTO -->
+          <ion-item>
+            <ion-label position="floating">Monto Pagado (Bs)</ion-label>
+            <ion-input type="number" [(ngModel)]="nuevo.monto_pagado"></ion-input>
+          </ion-item>
+
+          <!-- MÉTODO -->
+          <ion-item>
+            <ion-label>Método de Pago</ion-label>
+            <ion-select [(ngModel)]="nuevo.metodo_pago">
+              <ion-select-option value="Efectivo">Efectivo</ion-select-option>
+              <ion-select-option value="Transferencia">Transferencia</ion-select-option>
+              <ion-select-option value="Tarjeta">Tarjeta</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+        </ion-list>
+
+        <ion-button expand="block" color="success" shape="round" (click)="guardar()">
+          Guardar
+        </ion-button>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+  <!-- ================================================= -->
+  <!-- MODAL EDITAR -->
+  <!-- ================================================= -->
+  <ion-modal [isOpen]="modalEditar" (willDismiss)="cerrarModalEditar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="warning">
+          <ion-title>Modificar Inscripción</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalEditar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <h2 class="titulo-modal">Seleccionar inscripción</h2>
+
+        <ion-item>
+          <ion-label>Inscripción</ion-label>
+          <ion-select [(ngModel)]="inscripcionEditarId" (ionChange)="selectInscripcionEditar()">
+            <ion-select-option *ngFor="let i of inscripciones" [value]="i.id">
+              {{ i.nombreAtleta }} — {{ i.nombreEntrenamiento }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <div *ngIf="inscripcionEditar">
+
+          <h2 class="titulo-modal">Datos</h2>
+
+          <ion-item>
+            <ion-label position="floating">Observaciones</ion-label>
+            <ion-textarea [(ngModel)]="inscripcionEditar.observaciones"></ion-textarea>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Estado</ion-label>
+            <ion-select [(ngModel)]="inscripcionEditar.estado">
+              <ion-select-option value="Activo">Activo</ion-select-option>
+              <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+              <ion-select-option value="Suspendido">Suspendido</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-button expand="block" color="warning" shape="round" (click)="actualizar()">
+            Actualizar
+          </ion-button>
+
+        </div>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+  <!-- ================================================= -->
+  <!-- MODAL ELIMINAR -->
+  <!-- ================================================= -->
+  <ion-modal [isOpen]="modalEliminar" (willDismiss)="cerrarModalEliminar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="danger">
+          <ion-title>Suspender Inscripción</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalEliminar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <h2 class="titulo-modal">Seleccionar inscripción</h2>
+
+        <ion-item>
+          <ion-label>Inscripción</ion-label>
+          <ion-select [(ngModel)]="inscripcionEditarId">
+            <ion-select-option *ngFor="let i of inscripciones" [value]="i.id">
+              {{ i.nombreAtleta }} — {{ i.nombreEntrenamiento }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-button expand="block" color="danger" shape="round" (click)="eliminar()">
+          Suspender
+        </ion-button>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+<!-- ========================================================= -->
+<!-- 🔹 MODAL LISTA DE INSCRIPCIONES -->
+<!-- ========================================================= -->
+
+<ion-modal [isOpen]="modalLista" (willDismiss)="modalLista = false">
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar color="medium">
+        <ion-title>Lista de Inscripciones</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="modalLista = false">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+
+      <!-- BUSCADOR -->
+      <ion-searchbar
+        placeholder="Buscar atleta o entrenamiento..."
+        [(ngModel)]="buscarInsc"
+        (ionInput)="filtrarInscripciones()">
+      </ion-searchbar>
+
+      <!-- FILTERS -->
+      <ion-item>
+        <ion-label>Estado</ion-label>
+        <ion-select [(ngModel)]="filtroEstadoInsc" (ionChange)="filtrarInscripciones()">
+          <ion-select-option value="">Todos</ion-select-option>
+          <ion-select-option value="Activo">Activo</ion-select-option>
+          <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+          <ion-select-option value="Suspendido">Suspendido</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- LISTA -->
+      <ion-list>
+
+        <ion-item *ngFor="let i of inscripcionesFiltradas" lines="full">
+
+          <ion-grid>
+            <ion-row class="ion-align-items-center">
+
+              <ion-col size="9">
+                <h3><strong>{{ i.nombreAtleta }}</strong></h3>
+                <p>{{ i.nombreEntrenamiento }} — {{ i.estado }}</p>
+              </ion-col>
+
+              <ion-col size="3" class="ion-text-right">
+
+                <ion-button color="warning" size="small" fill="solid"
+                  (click)="editarDesdeListaInsc(i)">
+                  <ion-icon name="create-outline"></ion-icon>
+                </ion-button>
+
+                <ion-button color="danger" size="small" fill="solid"
+                  (click)="eliminarDesdeListaInsc(i)">
+                  <ion-icon name="ban-outline"></ion-icon>
+                </ion-button>
+
+              </ion-col>
+
+            </ion-row>
+          </ion-grid>
+
+        </ion-item>
+
+      </ion-list>
+
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
 </ion-content>
+

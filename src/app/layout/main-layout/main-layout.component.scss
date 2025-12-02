@@ -1,47 +1,112 @@
-/* Header */
-ion-toolbar {
-  --background: #004a7c;
-  --color: #ffffff;
+.layout-content {
+  padding: 16px;
+  height: 100%;
+  background: #f8f9fa;
 }
-ion-title { font-weight: 600; }
 
-/* Menú izquierdo */
-ion-menu { --width: 240px; }
 .menu-list ion-item {
-  --color: #004a7c;
-  --background: #f7f7f7;
-  margin-bottom: 6px;
-  border-radius: 10px;
-}
-.menu-list ion-item:hover { --background: #e9f5ff; }
-.menu-footer-buttons {
-  display: flex; justify-content: space-between; width: 100%;
+  --padding-start: 12px;
+  --inner-padding-end: 12px;
 }
 
-/* Avatar botón (compacto) */
-.avatar-btn {
-  width: 32px; height: 32px;
-  border: 2px solid #ffffff40;
+.menu-footer-buttons {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+/* Avatar dentro del popover */
+.avatar-btn img {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+}
+
+.popover-content {
+  width: 220px;
+
+  .user-box {
+    text-align: center;
+    padding: 10px;
+  }
+
+  .avatar-pop img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+  }
+
+  .user-data {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #444;
+  }
+}
+
+/* Iniciales del usuario */
+.initials {
+  width: 40px;
+  height: 40px;
+  background: #673ab7;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+/* Barra superior */
+ion-toolbar {
+  --background: #0061ff;
+  --color: white;
+}
+
+/* ========== MENÚ LATERAL ========== */
+.menu-list {
+  padding-top: 10px;
+}
+
+/* ITEM DEL MENÚ */
+.menu-item {
+  --background: transparent;
+  --border-radius: 12px;
+  margin: 6px 12px;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  --color: #232323;
+  transition: 0.20s ease;
+}
+
+.menu-item ion-icon {
+  color: #3d63ff;
+  font-size: 22px;
+}
+
+/* HOVER EFECTO */
+.menu-item:hover {
+  --background: rgba(61, 99, 255, 0.15);
+  transform: translateX(6px);
+}
+
+/* AVATAR (HEADER) */
+ion-avatar {
+  width: 45px !important;
+  height: 45px !important;
+  border: 2px solid white;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.25);
   border-radius: 50%;
   overflow: hidden;
 }
-.initials {
-  width: 100%; height: 100%;
-  display: grid; place-items: center;
-  background: #266aa6; color: #fff; font-weight: 700;
+
+ion-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* Popover */
-ion-popover { --width: 220px; }
-.popover-content { padding-top: 6px; }
-.user-box {
-  display: flex; gap: 10px; align-items: center;
-  padding: 8px 12px 2px 12px;
+/* Espaciado del avatar */
+ion-buttons[slot="end"] {
+  margin-right: 8px;
 }
-.avatar-pop { width: 40px; height: 40px; }
-.user-data .name { font-weight: 600; line-height: 1.1; }
-.user-data .email { font-size: 12px; color: #666; }
-
-/* Bienvenida */
-.welcome-container { text-align: center; margin-top: 3rem; }
-.welcome-container h2 { color: #004a7c; font-weight: 700; }

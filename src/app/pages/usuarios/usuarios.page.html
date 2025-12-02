@@ -1,127 +1,371 @@
-<!-- MENÚ IZQUIERDO -->
-<ion-menu contentId="main-content" type="overlay">
-  <ion-header>
-    <ion-toolbar color="primary">
-      <ion-title>Menú Principal</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Gestión de Usuarios</ion-title>
+  </ion-toolbar>
+</ion-header>
 
-  <ion-content class="ion-padding">
-    <ion-list lines="none" class="menu-list">
-      <ion-menu-toggle auto-hide="true">
-        <ion-item button (click)="navigateTo('home')">
-          <ion-icon name="home-outline" slot="start"></ion-icon>
-          <ion-label>Inicio</ion-label>
-        </ion-item>
+<ion-content class="ion-padding">
 
-     
-        <!-- 🔹 AQUÍ el botón que lleva a USUARIOS -->
-        <ion-item button (click)="navigateTo('usuarios')">
-          <ion-icon name="people-outline" slot="start"></ion-icon>
-          <ion-label>Usuarios</ion-label>
-        </ion-item>
+<ion-card class="card-opciones">
+  <ion-card-header>
+    <ion-card-title>Opciones</ion-card-title>
+  </ion-card-header>
 
-        <ion-item button (click)="navigateTo('roles')">
-          <ion-icon name="id-card-outline" slot="start"></ion-icon>
-          <ion-label>Roles</ion-label>
-        </ion-item>
+  <ion-card-content>
 
-   <ion-item button (click)="navigateTo('inscripciones')">
-          <ion-icon name="reader-outline" slot="start"></ion-icon>
-          <ion-label>Inscripciones</ion-label>
-        </ion-item>
+    <ion-button color="success" expand="block" shape="round" (click)="abrirModalAgregar()">
+      <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+      Agregar Usuario
+    </ion-button>
+
+    <ion-button color="warning" expand="block" shape="round" (click)="abrirModalEditar()">
+      <ion-icon name="create-outline" slot="start"></ion-icon>
+      Modificar Usuario
+    </ion-button>
+
+    <ion-button color="danger" expand="block" shape="round" (click)="abrirModalEliminar()">
+      <ion-icon name="trash-outline" slot="start"></ion-icon>
+      Suspender Usuario
+    </ion-button>
+
+    <ion-button color="medium" expand="block" shape="round" (click)="modalLista = true">
+      <ion-icon slot="start" name="list-outline"></ion-icon>
+      Listar Usuarios
+    </ion-button>
+
+  </ion-card-content>
+</ion-card>
 
 
-        <ion-item button (click)="navigateTo('entrenamientos')">
-          <ion-icon name="barbell-outline" slot="start"></ion-icon>
-          <ion-label>Entrenamientos</ion-label>
-        </ion-item>
-
-        <ion-item button (click)="navigateTo('actividades')">
-          <ion-icon name="calendar-outline" slot="start"></ion-icon>
-          <ion-label>Actividades</ion-label>
-        </ion-item>
-
-        <ion-item button (click)="navigateTo('informes')">
-          <ion-icon name="document-text-outline" slot="start"></ion-icon>
-          <ion-label>Informes</ion-label>
-        </ion-item>
-      </ion-menu-toggle>
-    </ion-list>
-  </ion-content>
-
-  <ion-footer>
-    <ion-toolbar color="light">
-      <ion-buttons class="menu-footer-buttons">
-        <ion-button fill="clear" (click)="goToProfile()">
-          <ion-icon name="person-outline" slot="start"></ion-icon>
-          Perfil
-        </ion-button>
-        <ion-button fill="clear" color="danger" (click)="logout()">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon>
-          Salir
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-footer>
-</ion-menu>
-
-<!-- CONTENIDO PRINCIPAL -->
-<div id="main-content">
-  <ion-header>
-    <ion-toolbar color="primary">
-      <ion-buttons slot="start">
-        <ion-menu-button></ion-menu-button>
-      </ion-buttons>
-
-      <ion-title>Usuarios</ion-title>
-
-      <ion-buttons slot="end">
-        <ion-button id="user-menu-btn" fill="clear">
-          <ion-avatar class="avatar-btn">
-            <img *ngIf="photoURL; else initialsTpl" [src]="photoURL" alt="user" />
-          </ion-avatar>
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
-
-  <!-- POPOVER -->
-  <ion-popover trigger="user-menu-btn" triggerAction="click">
+  <!-- ========================================================= -->
+  <!-- 🔹 MODAL AGREGAR -->
+  <!-- ========================================================= -->
+  <ion-modal [isOpen]="modalAgregar" (willDismiss)="cerrarModalAgregar()">
     <ng-template>
-      <ion-content class="popover-content">
-        <div class="user-box">
-          <ion-avatar class="avatar-pop">
-            <img *ngIf="photoURL; else initialsTpl" [src]="photoURL" alt="user" />
-          </ion-avatar>
-          <div class="user-data">
-            <div class="name">{{ displayName || 'Usuario' }}</div>
-            <div class="email">{{ email || '' }}</div>
-          </div>
-        </div>
+      <ion-header>
+        <ion-toolbar color="success">
+          <ion-title>Agregar Usuario</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalAgregar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
 
-        <ion-list lines="none">
-          <ion-item button (click)="goToProfile()">
-            <ion-icon name="person-outline" slot="start"></ion-icon>
-            <ion-label>Perfil</ion-label>
+      <ion-content class="ion-padding">
+        
+        <!-- FORMULARIO (igual que mandaste) -->
+        <ion-item>
+          <ion-label position="floating">Carnet de Identidad</ion-label>
+          <ion-input [(ngModel)]="nuevoUsuario.carnet"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input [(ngModel)]="nuevoUsuario.nombre"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Apellido</ion-label>
+          <ion-input [(ngModel)]="nuevoUsuario.apellido"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Teléfono</ion-label>
+          <ion-input type="tel" [(ngModel)]="nuevoUsuario.telefono"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Fecha de nacimiento</ion-label>
+          <ion-input type="date" [(ngModel)]="nuevoUsuario.fecha_nacimiento"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Género</ion-label>
+          <ion-select [(ngModel)]="nuevoUsuario.genero">
+            <ion-select-option value="M">Masculino</ion-select-option>
+            <ion-select-option value="F">Femenino</ion-select-option>
+            <ion-select-option value="O">Otro</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Estado</ion-label>
+          <ion-select [(ngModel)]="nuevoUsuario.estado">
+            <ion-select-option value="Activo">Activo</ion-select-option>
+            <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Rol</ion-label>
+          <ion-select [(ngModel)]="nuevoUsuario.rol">
+            <ion-select-option *ngFor="let r of roles" [value]="r.nombre">
+              {{ r.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- CAMPOS EXTRA -->
+        <ng-container *ngIf="nuevoUsuario.rol === 'Administrador' || nuevoUsuario.rol === 'Entrenador'">
+          <ion-item>
+            <ion-label position="floating">Correo</ion-label>
+            <ion-input type="email" [(ngModel)]="nuevoUsuario.correo"></ion-input>
           </ion-item>
-          <ion-item button (click)="logout()">
-            <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
-            <ion-label color="danger">Cerrar sesión</ion-label>
+
+          <ion-item>
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input type="password" [(ngModel)]="nuevoUsuario.password"></ion-input>
           </ion-item>
-        </ion-list>
+        </ng-container>
+
+        <ion-button expand="block" color="success" (click)="guardarUsuario()">
+          Guardar
+        </ion-button>
+
       </ion-content>
     </ng-template>
-  </ion-popover>
+  </ion-modal>
 
-  <ion-content class="ion-padding">
-    <div class="welcome-container">
-      <h2>Usuarios</h2>
-      <p>Usa el menú lateral para navegar.</p>
-    </div>
-  </ion-content>
-</div>
 
-<ng-template #initialsTpl>
-  <div class="initials">{{ initials }}</div>
-</ng-template>
+
+  <!-- ========================================================= -->
+  <!-- 🔹 MODAL EDITAR -->
+  <!-- ========================================================= -->
+  <ion-modal [isOpen]="modalEditar" (willDismiss)="cerrarModalEditar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="warning">
+          <ion-title>Modificar Usuario</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalEditar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <ion-item>
+          <ion-label>Seleccionar Usuario</ion-label>
+          <ion-select [(ngModel)]="usuarioEditarId" (ionChange)="cargarUsuarioEditar()">
+            <ion-select-option *ngFor="let u of usuarios" [value]="u.id">
+              {{ u.carnet }} - {{ u.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ng-container *ngIf="usuarioEditar">
+
+          <!-- CAMPOS EDITAR (igual que mandaste) -->
+
+          <ion-item>
+            <ion-label position="floating">Carnet</ion-label>
+            <ion-input [(ngModel)]="usuarioEditar.carnet"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Nombre</ion-label>
+            <ion-input [(ngModel)]="usuarioEditar.nombre"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Apellido</ion-label>
+            <ion-input [(ngModel)]="usuarioEditar.apellido"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Teléfono</ion-label>
+            <ion-input [(ngModel)]="usuarioEditar.telefono"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Fecha nacimiento</ion-label>
+            <ion-input type="date" [(ngModel)]="usuarioEditar.fecha_nacimiento"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Género</ion-label>
+            <ion-select [(ngModel)]="usuarioEditar.genero">
+              <ion-select-option value="M">Masculino</ion-select-option>
+              <ion-select-option value="F">Femenino</ion-select-option>
+              <ion-select-option value="O">Otro</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Estado</ion-label>
+            <ion-select [(ngModel)]="usuarioEditar.estado">
+              <ion-select-option value="Activo">Activo</ion-select-option>
+              <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+              <ion-select-option value="Suspendido">Suspendido</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Rol</ion-label>
+            <ion-select [(ngModel)]="usuarioEditar.rol">
+              <ion-select-option *ngFor="let r of roles" [value]="r.nombre">
+                {{ r.nombre }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ng-container *ngIf="usuarioEditar.rol === 'Administrador' || usuarioEditar.rol === 'Entrenador'">
+            <ion-item>
+              <ion-label position="floating">Correo</ion-label>
+              <ion-input [(ngModel)]="usuarioEditar.correo"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="floating">Contraseña</ion-label>
+              <ion-input type="password" [(ngModel)]="usuarioEditar.password"></ion-input>
+            </ion-item>
+          </ng-container>
+
+          <ion-button expand="block" color="warning" (click)="actualizarUsuario()">
+            Actualizar
+          </ion-button>
+
+        </ng-container>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+
+
+  <!-- ========================================================= -->
+  <!-- 🔹 MODAL SUSPENDER -->
+  <!-- ========================================================= -->
+  <ion-modal [isOpen]="modalEliminar" (willDismiss)="cerrarModalEliminar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="danger">
+          <ion-title>Suspender Usuario</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalEliminar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <ion-item>
+          <ion-label>Seleccionar Usuario</ion-label>
+          <ion-select [(ngModel)]="usuarioEliminarId">
+            <ion-select-option *ngFor="let u of usuarios" [value]="u.id">
+              {{ u.carnet }} - {{ u.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-button expand="block" color="danger" (click)="eliminarUsuario()">
+          Suspender
+        </ion-button>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+
+
+
+  <!-- ========================================================= -->
+  <!-- 🔹 MODAL LISTA DE USUARIOS (CORREGIDO) -->
+  <!-- ========================================================= -->
+
+  <ion-modal [isOpen]="modalLista" (willDismiss)="modalLista = false">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="medium">
+          <ion-title>Lista de Usuarios</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="modalLista = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <!-- BUSCADOR -->
+        <ion-searchbar
+          placeholder="Buscar por nombre o carnet..."
+          [(ngModel)]="buscar"
+          (ionInput)="filtrarUsuarios()">
+        </ion-searchbar>
+
+        <!-- FILTROS -->
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>Rol</ion-label>
+                <ion-select [(ngModel)]="filtroRol" (ionChange)="filtrarUsuarios()">
+                  <ion-select-option value="">Todos</ion-select-option>
+                  <ion-select-option value="Administrador">Administrador</ion-select-option>
+                  <ion-select-option value="Entrenador">Entrenador</ion-select-option>
+                  <ion-select-option value="Atleta">Atleta</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>Estado</ion-label>
+                <ion-select [(ngModel)]="filtroEstado" (ionChange)="filtrarUsuarios()">
+                  <ion-select-option value="">Todos</ion-select-option>
+                  <ion-select-option value="Activo">Activo</ion-select-option>
+                  <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+                  <ion-select-option value="Suspendido">Suspendido</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+
+        <!-- LISTA DE USUARIOS -->
+        <ion-list>
+
+          <ion-item *ngFor="let u of usuariosFiltrados" lines="full">
+
+            <ion-grid>
+              <ion-row class="ion-align-items-center">
+
+                <!-- INFO IZQUIERDA -->
+                <ion-col size="9">
+                  <h3><strong>{{ u.carnet }}</strong> — {{ u.nombre }} {{ u.apellido }}</h3>
+                  <p>{{ u.rol }} — {{ u.estado }}</p>
+                </ion-col>
+
+                <!-- BOTONES DERECHA -->
+                <ion-col size="3" class="ion-text-right">
+
+                  <ion-button color="warning" fill="solid" size="small"
+                    (click)="editarDesdeLista(u)">
+                    <ion-icon name="create-outline"></ion-icon>
+                  </ion-button>
+
+                  <ion-button color="danger" fill="solid" size="small"
+                    (click)="eliminarDesdeLista(u)">
+                    <ion-icon name="ban-outline"></ion-icon>
+                  </ion-button>
+
+                </ion-col>
+
+              </ion-row>
+            </ion-grid>
+
+          </ion-item>
+
+        </ion-list>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

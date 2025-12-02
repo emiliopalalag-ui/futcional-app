@@ -1,10 +1,48 @@
-<ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Gestión de Roles</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content class="ion-padding">
-  <h2>Página de Roles</h2>
-  <p>Aquí podrás administrar los distintos roles del sistema.</p>
+
+  <h2>{{ editando ? 'Editar Rol' : 'Agregar Rol' }}</h2>
+
+  <ion-item>
+    <ion-label position="floating">Nombre</ion-label>
+    <ion-input [(ngModel)]="rolActual.nombre"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Descripción</ion-label>
+    <ion-textarea [(ngModel)]="rolActual.descripcion"></ion-textarea>
+  </ion-item>
+
+  <div class="btn-group">
+    <ion-button expand="block" color="primary" (click)="guardarRol()">
+      {{ editando ? 'Actualizar' : 'Guardar' }}
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" color="medium" *ngIf="editando" (click)="cancelarEdicion()">
+      Cancelar
+    </ion-button>
+  </div>
+
+  <ion-list class="ion-margin-top">
+    <ion-list-header>
+      <ion-label>Roles Registrados</ion-label>
+    </ion-list-header>
+
+    <ion-item *ngFor="let rol of roles">
+      <ion-label>
+        <h2>{{ rol.nombre }}</h2>
+        <p>{{ rol.descripcion }}</p>
+      </ion-label>
+
+      <ion-buttons slot="end">
+        <ion-button color="primary" fill="clear" (click)="editarRol(rol)">
+          <ion-icon name="create-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button color="danger" fill="clear" (click)="eliminarRol(rol)">
+          <ion-icon name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+
 </ion-content>

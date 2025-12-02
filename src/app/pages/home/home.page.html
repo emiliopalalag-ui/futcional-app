@@ -1,127 +1,65 @@
-<!-- MENÚ IZQUIERDO -->
-<ion-menu contentId="main-content" type="overlay">
-  <ion-header>
-    <ion-toolbar color="primary">
-      <ion-title>Menú Principal</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Inicio</ion-title>
+  </ion-toolbar>
+</ion-header>
 
-  <ion-content class="ion-padding">
-    <ion-list lines="none" class="menu-list">
-      <ion-menu-toggle auto-hide="true">
-        <ion-item button (click)="navigateTo('home')">
-          <ion-icon name="home-outline" slot="start"></ion-icon>
-          <ion-label>Inicio</ion-label>
-        </ion-item>
+<ion-content class="home-bg">
 
-     
-        <!-- 🔹 AQUÍ el botón que lleva a USUARIOS -->
-        <ion-item button (click)="navigateTo('usuarios')">
-          <ion-icon name="people-outline" slot="start"></ion-icon>
-          <ion-label>Usuarios</ion-label>
-        </ion-item>
+  <!-- LOADING -->
+  <div *ngIf="cargando" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
 
-        <ion-item button (click)="navigateTo('roles')">
-          <ion-icon name="id-card-outline" slot="start"></ion-icon>
-          <ion-label>Roles</ion-label>
-        </ion-item>
+  <!-- PERFIL CARGADO -->
+  <ng-container *ngIf="!cargando && usuario">
 
-   <ion-item button (click)="navigateTo('inscripciones')">
-          <ion-icon name="reader-outline" slot="start"></ion-icon>
-          <ion-label>Inscripciones</ion-label>
-        </ion-item>
+    <!-- Bienvenida -->
+    <div class="welcome-card">
+      <h2>👋 Bienvenido</h2>
+      <h3><strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong></h3>
+    </div>
 
+    <!-- Tarjeta de perfil -->
+    <ion-card class="perfil-card">
 
-        <ion-item button (click)="navigateTo('entrenamientos')">
-          <ion-icon name="barbell-outline" slot="start"></ion-icon>
-          <ion-label>Entrenamientos</ion-label>
-        </ion-item>
+      <div class="perfil-header">
+        <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" class="foto-perfil"/>
+        <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+        <p class="rol">{{ usuario.rol }}</p>
+      </div>
 
-        <ion-item button (click)="navigateTo('actividades')">
-          <ion-icon name="calendar-outline" slot="start"></ion-icon>
-          <ion-label>Actividades</ion-label>
-        </ion-item>
-
-        <ion-item button (click)="navigateTo('informes')">
-          <ion-icon name="document-text-outline" slot="start"></ion-icon>
-          <ion-label>Informes</ion-label>
-        </ion-item>
-      </ion-menu-toggle>
-    </ion-list>
-  </ion-content>
-
-  <ion-footer>
-    <ion-toolbar color="light">
-      <ion-buttons class="menu-footer-buttons">
-        <ion-button fill="clear" (click)="goToProfile()">
-          <ion-icon name="person-outline" slot="start"></ion-icon>
-          Perfil
-        </ion-button>
-        <ion-button fill="clear" color="danger" (click)="logout()">
-          <ion-icon name="log-out-outline" slot="start"></ion-icon>
-          Salir
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-footer>
-</ion-menu>
-
-<!-- CONTENIDO PRINCIPAL -->
-<div id="main-content">
-  <ion-header>
-    <ion-toolbar color="primary">
-      <ion-buttons slot="start">
-        <ion-menu-button></ion-menu-button>
-      </ion-buttons>
-
-      <ion-title>Panel Principal</ion-title>
-
-      <ion-buttons slot="end">
-        <ion-button id="user-menu-btn" fill="clear">
-          <ion-avatar class="avatar-btn">
-            <img *ngIf="photoURL; else initialsTpl" [src]="photoURL" alt="user" />
-          </ion-avatar>
-        </ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
-
-  <!-- POPOVER -->
-  <ion-popover trigger="user-menu-btn" triggerAction="click">
-    <ng-template>
-      <ion-content class="popover-content">
-        <div class="user-box">
-          <ion-avatar class="avatar-pop">
-            <img *ngIf="photoURL; else initialsTpl" [src]="photoURL" alt="user" />
-          </ion-avatar>
-          <div class="user-data">
-            <div class="name">{{ displayName || 'Usuario' }}</div>
-            <div class="email">{{ email || '' }}</div>
-          </div>
-        </div>
+      <ion-card-content>
 
         <ion-list lines="none">
-          <ion-item button (click)="goToProfile()">
-            <ion-icon name="person-outline" slot="start"></ion-icon>
-            <ion-label>Perfil</ion-label>
+
+          <ion-item *ngIf="usuario.correo">
+            <ion-icon name="mail-outline" slot="start" color="primary"></ion-icon>
+            <ion-label>
+              <strong>Correo: </strong>{{ usuario.correo }}
+            </ion-label>
           </ion-item>
-          <ion-item button (click)="logout()">
-            <ion-icon name="log-out-outline" slot="start" color="danger"></ion-icon>
-            <ion-label color="danger">Cerrar sesión</ion-label>
+
+          <ion-item *ngIf="usuario.telefono">
+            <ion-icon name="call-outline" slot="start" color="success"></ion-icon>
+            <ion-label>
+              <strong>Teléfono: </strong>{{ usuario.telefono }}
+            </ion-label>
           </ion-item>
+
+          <ion-item *ngIf="usuario.estado">
+            <ion-icon name="checkmark-circle-outline" slot="start" color="warning"></ion-icon>
+            <ion-label>
+              <strong>Estado: </strong>{{ usuario.estado }}
+            </ion-label>
+          </ion-item>
+
         </ion-list>
-      </ion-content>
-    </ng-template>
-  </ion-popover>
 
-  <ion-content class="ion-padding">
-    <div class="welcome-container">
-      <h2>Bienvenido al Sistema FUTcional</h2>
-      <p>Usa el menú lateral para navegar.</p>
-    </div>
-  </ion-content>
-</div>
+      </ion-card-content>
+    </ion-card>
 
-<ng-template #initialsTpl>
-  <div class="initials">{{ initials }}</div>
-</ng-template>
+  </ng-container>
+
+</ion-content>
+

@@ -1,13 +1,469 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>entrenamientos</ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Gestión de Entrenamientos</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">entrenamientos</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
+
+  <ion-card class="card-opciones">
+    <ion-card-header>
+      <ion-card-title>Opciones</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <ion-button expand="block" color="success" shape="round" (click)="abrirModalAgregar()">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Agregar Entrenamiento
+      </ion-button>
+
+      <ion-button expand="block" color="warning" shape="round" (click)="abrirModalEditar()">
+        <ion-icon name="create-outline" slot="start"></ion-icon>
+        Modificar Entrenamiento
+      </ion-button>
+
+      <ion-button expand="block" color="danger" shape="round" (click)="abrirModalEliminar()">
+        <ion-icon name="trash-outline" slot="start"></ion-icon>
+        Eliminar Entrenamiento
+      </ion-button>
+
+      <ion-button expand="block" color="medium" shape="round" (click)="modalLista = true">
+        <ion-icon name="list-outline" slot="start"></ion-icon>
+        Listar Entrenamientos
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- MODAL AGREGAR -->
+  <ion-modal [isOpen]="modalAgregar" (willDismiss)="cerrarModalAgregar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="success">
+          <ion-title>Agregar Entrenamiento</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalAgregar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <h2 class="titulo-modal">Datos del entrenamiento</h2>
+
+        <ion-list class="formulario">
+
+          <ion-item>
+            <ion-label position="floating">Nombre</ion-label>
+            <ion-input [(ngModel)]="nuevoEntrenamiento.nombre"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Descripción</ion-label>
+            <ion-input [(ngModel)]="nuevoEntrenamiento.descripcion"></ion-input>
+          </ion-item>
+
+          <!-- Horario -->
+          <ion-item button detail (click)="modalHoraAgregar = true">
+            <ion-label>Horario</ion-label>
+            <ion-note slot="end">
+              {{ nuevoEntrenamiento.horario || 'Seleccionar hora' }}
+            </ion-note>
+          </ion-item>
+
+          <!-- Días -->
+          <ion-item button detail (click)="modalDias = true">
+            <ion-label>Días</ion-label>
+            <ion-note slot="end">
+              {{ textoDias(nuevoEntrenamiento.dias) || 'Seleccionar días' }}
+            </ion-note>
+          </ion-item>
+
+          <!-- Estado -->
+          <ion-item>
+            <ion-label>Estado</ion-label>
+            <ion-select [(ngModel)]="nuevoEntrenamiento.estado">
+              <ion-select-option value="Activo">Activo</ion-select-option>
+              <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+              <ion-select-option value="Suspendido">Suspendido</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Entrenador</ion-label>
+            <ion-select [(ngModel)]="nuevoEntrenamiento.idEntrenador" interface="popover">
+              <ion-select-option *ngFor="let e of entrenadores" [value]="e.id">
+                {{ e.nombre }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+        </ion-list>
+
+        <ion-button expand="block" color="success" (click)="guardarEntrenamiento()">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Guardar
+        </ion-button>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- MODAL EDITAR -->
+  <ion-modal [isOpen]="modalEditar" (willDismiss)="cerrarModalEditar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="warning">
+          <ion-title>Modificar Entrenamiento</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalEditar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <ion-item>
+          <ion-label>Seleccionar Entrenamiento</ion-label>
+          <ion-select [(ngModel)]="entrenamientoEditarId" (ionChange)="cargarEntrenamientoEditar()">
+            <ion-select-option *ngFor="let e of entrenamientos" [value]="e.id">
+              {{ e.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ng-container *ngIf="entrenamientoEditar">
+
+          <ion-list class="formulario">
+
+            <ion-item>
+              <ion-label position="floating">Nombre</ion-label>
+              <ion-input [(ngModel)]="entrenamientoEditar.nombre"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="floating">Descripción</ion-label>
+              <ion-input [(ngModel)]="entrenamientoEditar.descripcion"></ion-input>
+            </ion-item>
+
+            <!-- Horario -->
+            <ion-item button detail (click)="modalHoraEditar = true">
+              <ion-label>Horario</ion-label>
+              <ion-note slot="end">
+                {{ entrenamientoEditar.horario || 'Seleccionar hora' }}
+              </ion-note>
+            </ion-item>
+
+            <!-- Días -->
+            <ion-item button detail (click)="modalDiasEditar = true">
+              <ion-label>Días</ion-label>
+              <ion-note slot="end">
+                {{ textoDias(entrenamientoEditar.dias) || 'Seleccionar días' }}
+              </ion-note>
+            </ion-item>
+
+            <!-- Estado -->
+            <ion-item>
+              <ion-label>Estado</ion-label>
+              <ion-select [(ngModel)]="entrenamientoEditar.estado">
+                <ion-select-option value="Activo">Activo</ion-select-option>
+                <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+                <ion-select-option value="Suspendido">Suspendido</ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item>
+              <ion-label>Entrenador</ion-label>
+              <ion-select [(ngModel)]="entrenamientoEditar.idEntrenador">
+                <ion-select-option *ngFor="let e of entrenadores" [value]="e.id">
+                  {{ e.nombre }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+
+          </ion-list>
+
+          <ion-button expand="block" color="warning" (click)="actualizarEntrenamiento()">
+            <ion-icon slot="start" name="refresh-outline"></ion-icon>
+            Actualizar
+          </ion-button>
+
+        </ng-container>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- MODAL ELIMINAR -->
+  <ion-modal [isOpen]="modalEliminar" (willDismiss)="cerrarModalEliminar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="danger">
+          <ion-title>Eliminar Entrenamiento</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalEliminar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <ion-item>
+          <ion-label>Seleccionar Entrenamiento</ion-label>
+          <ion-select [(ngModel)]="entrenamientoEliminarId">
+            <ion-select-option *ngFor="let e of entrenamientos" [value]="e.id">
+              {{ e.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-button expand="block" color="danger" (click)="eliminarEntrenamiento()">
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          Eliminar
+        </ion-button>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+  <!-- MODAL LISTA ENTRENAMIENTOS -->
+  <ion-modal [isOpen]="modalLista" (willDismiss)="modalLista = false">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="medium">
+          <ion-title>Lista de Entrenamientos</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="modalLista = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <!-- BUSCADOR -->
+        <ion-searchbar
+          placeholder="Buscar por nombre o descripción..."
+          [(ngModel)]="buscar"
+          (ionInput)="filtrarEntrenamientos()">
+        </ion-searchbar>
+
+        <!-- FILTROS -->
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>Estado</ion-label>
+                <ion-select [(ngModel)]="filtroEstado" (ionChange)="filtrarEntrenamientos()">
+                  <ion-select-option value="">Todos</ion-select-option>
+                  <ion-select-option value="Activo">Activo</ion-select-option>
+                  <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+                  <ion-select-option value="Suspendido">Suspendido</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>Entrenador</ion-label>
+                <ion-select [(ngModel)]="filtroEntrenador" (ionChange)="filtrarEntrenamientos()">
+                  <ion-select-option value="">Todos</ion-select-option>
+                  <ion-select-option *ngFor="let ent of entrenadores" [value]="ent.id">
+                    {{ ent.nombre }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <!-- LISTA -->
+        <ion-list>
+          <ion-item *ngFor="let e of entrenamientosFiltrados" lines="full">
+
+            <ion-grid>
+              <ion-row class="ion-align-items-center">
+                <ion-col size="9">
+                  <h3>
+                    <strong>{{ e.nombre }}</strong>
+                    <span *ngIf="e.horario"> — {{ e.horario }}</span>
+                  </h3>
+                  <p *ngIf="e.descripcion">{{ e.descripcion }}</p>
+                  <p>
+                    Días: {{ e.dias || '—' }}<br>
+                    Entrenador: {{ getNombreEntrenador(e) }}<br>
+                    Estado: {{ e.estado }}
+                  </p>
+                </ion-col>
+
+                <ion-col size="3" class="ion-text-right">
+                  <ion-button color="warning" size="small" (click)="editarDesdeLista(e)">
+                    <ion-icon name="create-outline"></ion-icon>
+                  </ion-button>
+
+                  <ion-button color="danger" size="small" (click)="eliminarDesdeLista(e)">
+                    <ion-icon name="trash-outline"></ion-icon>
+                  </ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+
+          </ion-item>
+        </ion-list>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+  <!-- MODAL DÍAS - AGREGAR -->
+  <ion-modal [isOpen]="modalDias" (willDismiss)="modalDias = false">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Días del entrenamiento</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="modalDias = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <ion-list>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="nuevoEntrenamiento.dias.lun"></ion-checkbox>
+            <ion-label>Lunes</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="nuevoEntrenamiento.dias.mar"></ion-checkbox>
+            <ion-label>Martes</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="nuevoEntrenamiento.dias.mier"></ion-checkbox>
+            <ion-label>Miércoles</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="nuevoEntrenamiento.dias.jue"></ion-checkbox>
+            <ion-label>Jueves</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="nuevoEntrenamiento.dias.vier"></ion-checkbox>
+            <ion-label>Viernes</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="nuevoEntrenamiento.dias.sab"></ion-checkbox>
+            <ion-label>Sábado</ion-label>
+          </ion-item>
+        </ion-list>
+
+        <ion-button expand="block" color="success" (click)="modalDias = false">
+          Aceptar
+        </ion-button>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- MODAL DÍAS - EDITAR -->
+  <ion-modal [isOpen]="modalDiasEditar" (willDismiss)="modalDiasEditar = false">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="warning">
+          <ion-title>Días del entrenamiento</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="modalDiasEditar = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding" *ngIf="entrenamientoEditar">
+        <ion-list>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="entrenamientoEditar.dias.lun"></ion-checkbox>
+            <ion-label>Lunes</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="entrenamientoEditar.dias.mar"></ion-checkbox>
+            <ion-label>Martes</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="entrenamientoEditar.dias.mier"></ion-checkbox>
+            <ion-label>Miércoles</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="entrenamientoEditar.dias.jue"></ion-checkbox>
+            <ion-label>Jueves</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="entrenamientoEditar.dias.vier"></ion-checkbox>
+            <ion-label>Viernes</ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-checkbox slot="start" [(ngModel)]="entrenamientoEditar.dias.sab"></ion-checkbox>
+            <ion-label>Sábado</ion-label>
+          </ion-item>
+        </ion-list>
+
+        <ion-button expand="block" color="success" (click)="modalDiasEditar = false">
+          Aceptar
+        </ion-button>
+
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- MODAL HORA - AGREGAR -->
+  <ion-modal [isOpen]="modalHoraAgregar" (willDismiss)="modalHoraAgregar = false">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Seleccionar hora</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="modalHoraAgregar = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-datetime
+          presentation="time"
+          hour-cycle="h23"
+          (ionChange)="onHoraAgregarChange($event)">
+        </ion-datetime>
+
+        <ion-button expand="block" color="success" (click)="modalHoraAgregar = false">
+          Aceptar
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- MODAL HORA - EDITAR -->
+  <ion-modal [isOpen]="modalHoraEditar" (willDismiss)="modalHoraEditar = false">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Seleccionar hora</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="modalHoraEditar = false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-datetime
+          presentation="time"
+          hour-cycle="h23"
+          (ionChange)="onHoraEditarChange($event)">
+        </ion-datetime>
+
+        <ion-button expand="block" color="success" (click)="modalHoraEditar = false">
+          Aceptar
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>

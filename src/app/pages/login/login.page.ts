@@ -1,58 +1,88 @@
 import { Component } from '@angular/core';
-import { IonicModule, ToastController } from '@ionic/angular';
+import {
+  IonContent,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonIcon,
+  IonButton,
+  IonSpinner,
+} from '@ionic/angular/standalone';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithPopup,
-} from 'firebase/auth';
+import { ToastController, LoadingController } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
-  imports: [IonicModule, CommonModule, FormsModule, RouterModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterModule,
+
+    IonContent,
+    IonItem,
+    IonLabel,
+    IonInput,
+    IonIcon,
+    IonButton,
+    IonSpinner,
+  ],
 })
 export class LoginPage {
-  // 👇 Variables que ngModel usará
+
   email = '';
   password = '';
+  showPassword = false;
+  isLoading = false;
 
-  constructor(private router: Router, private toastCtrl: ToastController) {}
+  constructor(
+    private router: Router,
+    private toastCtrl: ToastController,
+    private loadingCtrl: LoadingController,
+    private authSrv: AuthService
+  ) {}
 
   async loginEmail() {
-    console.log('click detectado:', this.email, this.password); // <-- para verificar
-    const auth = getAuth();
+    if (!this.email || !this.password) {
+      return this.showToast('Ingresa correo y contraseña');
+    }
+
+    const loading = await this.loadingCtrl.create({
+      message: 'Validando...',
+      spinner: 'crescent',
+    });
+
+    this.isLoading = true;
+    await loading.present();
+
     try {
-      const user = await signInWithEmailAndPassword(auth, this.email, this.password);
-      console.log('Usuario logueado:', user.user.email);
+      const usuario = await this.authSrv.login(this.email, this.password);
+      await loading.dismiss();
+      this.isLoading = false;
+
+      localStorage.setItem('usuario', JSON.stringify(usuario));
       this.router.navigateByUrl('/home', { replaceUrl: true });
-    } catch (error: any) {
-      this.showToast('Error: ' + error.message);
+
+    } catch (err: any) {
+      this.isLoading = false;
+      await loading.dismiss();
+      this.showToast(err.message);
     }
   }
 
-  async loginGoogle() {
-    const provider = new GoogleAuthProvider();
-    const auth = getAuth();
-    try {
-      await signInWithPopup(auth, provider);
-      this.router.navigateByUrl('/home', { replaceUrl: true });
-    } catch (error: any) {
-      this.showToast('Error con Google: ' + error.message);
-    }
-  }
-
-  private async showToast(message: string) {
+  private async showToast(message: string, color: string = 'danger') {
     const toast = await this.toastCtrl.create({
       message,
       duration: 2500,
-      color: 'danger',
+      color,
     });
-    await toast.present();
+    toast.present();
   }
+  
 }

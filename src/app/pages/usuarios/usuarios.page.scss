@@ -1,47 +1,35 @@
-/* Header */
-ion-toolbar {
-  --background: #004a7c;
-  --color: #ffffff;
+h2 {
+  text-align:center;
+  font-weight:600;
+  margin-bottom:12px;
 }
-ion-title { font-weight: 600; }
 
-/* Menú izquierdo */
-ion-menu { --width: 240px; }
-.menu-list ion-item {
-  --color: #004a7c;
-  --background: #f7f7f7;
-  margin-bottom: 6px;
+ion-item {
+  margin-bottom:10px;
+}
+
+.btns {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* TARJETA DE OPCIONES */
+.card-opciones {
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}
+
+/* TITULO DE LOS MODALES */
+.titulo-modal {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+/* FORMULARIOS */
+.formulario ion-item {
+  --background: #efefef;
   border-radius: 10px;
+  margin-bottom: 12px;
 }
-.menu-list ion-item:hover { --background: #e9f5ff; }
-.menu-footer-buttons {
-  display: flex; justify-content: space-between; width: 100%;
-}
-
-/* Avatar botón (compacto) */
-.avatar-btn {
-  width: 32px; height: 32px;
-  border: 2px solid #ffffff40;
-  border-radius: 50%;
-  overflow: hidden;
-}
-.initials {
-  width: 100%; height: 100%;
-  display: grid; place-items: center;
-  background: #266aa6; color: #fff; font-weight: 700;
-}
-
-/* Popover */
-ion-popover { --width: 220px; }
-.popover-content { padding-top: 6px; }
-.user-box {
-  display: flex; gap: 10px; align-items: center;
-  padding: 8px 12px 2px 12px;
-}
-.avatar-pop { width: 40px; height: 40px; }
-.user-data .name { font-weight: 600; line-height: 1.1; }
-.user-data .email { font-size: 12px; color: #666; }
-
-/* Bienvenida */
-.welcome-container { text-align: center; margin-top: 3rem; }
-.welcome-container h2 { color: #004a7c; font-weight: 700; }

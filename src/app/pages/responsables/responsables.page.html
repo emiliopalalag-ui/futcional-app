@@ -1,0 +1,86 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Responsables de Atletas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        {{ editando ? 'Editar Asignación' : 'Asignar Responsable' }}
+      </ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <!-- SELECT RESPONSABLE -->
+      <ion-item>
+        <ion-label>Responsable</ion-label>
+        <ion-select [(ngModel)]="nuevo.id_responsable">
+          <ion-select-option *ngFor="let r of responsables" [value]="r.id">
+            {{ r.nombre }} {{ r.apellido }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- SELECT ATLETA -->
+      <ion-item>
+        <ion-label>Atleta</ion-label>
+        <ion-select [(ngModel)]="nuevo.id_atleta">
+          <ion-select-option *ngFor="let a of atletas" [value]="a.id">
+            {{ a.nombre }} {{ a.apellido }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- PARENTESCO -->
+      <ion-item>
+        <ion-label position="floating">Parentesco</ion-label>
+        <ion-input [(ngModel)]="nuevo.parentesco"></ion-input>
+      </ion-item>
+
+      <div style="display: flex; gap: 10px;">
+        <ion-button expand="block" color="success" (click)="guardar()">
+          {{ editando ? 'Actualizar' : 'Guardar' }}
+        </ion-button>
+        
+        <ion-button *ngIf="editando" expand="block" color="medium" (click)="cancelarEdicion()">
+          Cancelar
+        </ion-button>
+      </div>
+
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Lista de Asignaciones</ion-card-title>
+    </ion-card-header>
+
+    <ion-list>
+
+      <ion-item *ngFor="let r of asignaciones">
+
+        <ion-label>
+          <!-- Usar funciones para obtener los nombres -->
+          <b>{{ getNombreResponsable(r.id_responsable) }}</b> ({{ r.parentesco }})  
+          <br>
+          Responsable de: <b>{{ getNombreAtleta(r.id_atleta) }}</b>
+        </ion-label>
+
+        <ion-button color="warning" size="small" (click)="editar(r)">
+          Editar
+        </ion-button>
+
+        <ion-button color="danger" size="small" (click)="eliminar(r.id!)">
+          Eliminar
+        </ion-button>
+
+      </ion-item>
+
+    </ion-list>
+  </ion-card>
+
+</ion-content>

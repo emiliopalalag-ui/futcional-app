@@ -9,7 +9,8 @@ import {
   deleteDoc,
   getDoc,
   CollectionReference,
-  DocumentData
+  DocumentData,
+  setDoc
 } from '@angular/fire/firestore';
 
 @Injectable({
@@ -20,13 +21,13 @@ export class FirebaseService {
   private usuariosCollection: CollectionReference<DocumentData>;
   private rolesCollection: CollectionReference<DocumentData>;
 
-  constructor(private firestore: Firestore) {
+  constructor(public firestore: Firestore) {
     this.usuariosCollection = collection(this.firestore, 'usuarios');
     this.rolesCollection = collection(this.firestore, 'roles');
   }
 
   // ======================
-  // ==== CRUD ROLES ======
+  // CRUD ROLES
   // ======================
 
   async obtenerRoles() {
@@ -48,9 +49,9 @@ export class FirebaseService {
     await deleteDoc(ref);
   }
 
-  // ==========================
-  // ==== CRUD USUARIOS ======
-  // ==========================
+  // ======================
+  // CRUD USUARIOS
+  // ======================
 
   async obtenerUsuarios() {
     const snapshot = await getDocs(this.usuariosCollection);
@@ -64,7 +65,8 @@ export class FirebaseService {
   }
 
   async agregarUsuario(usuario: any) {
-    return await addDoc(this.usuariosCollection, usuario);
+    const ref = doc(this.firestore, `usuarios/${usuario.id}`);
+    return await setDoc(ref, usuario);
   }
 
   async actualizarUsuario(id: string, usuario: any) {
