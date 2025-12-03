@@ -5,19 +5,24 @@ import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
 
-  private isLogged = false;
+  constructor(private auth: Auth, private router: Router) {}
 
-  constructor(private auth: Auth, private router: Router) {
-    onAuthStateChanged(this.auth, user => {
-      this.isLogged = !!user;
+  canActivate(): Promise<boolean> {
+    return new Promise((resolve) => {
+
+      onAuthStateChanged(this.auth, (user) => {
+
+        if (user) {
+          // ✔ Usuario logeado → pasar
+          resolve(true);
+        } else {
+          // ❌ NO logeado → redirigir ANTES de resolver
+          this.router.navigate(['/login']);
+          resolve(false);
+        }
+
+      });
+
     });
-  }
-
-  canActivate(): boolean {
-    if (!this.isLogged) {
-      this.router.navigate(['/login']);
-      return false;
-    }
-    return true;
   }
 }

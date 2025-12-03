@@ -1,13 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule, ToastController, AlertController } from '@ionic/angular';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-interface Rol {
-  id: string;
-  nombre: string;
-  descripcion?: string;
-}
+import { RolesService, Rol } from 'src/app/services/roles.service';
 
 @Component({
   selector: 'app-roles',
@@ -17,89 +13,223 @@ interface Rol {
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class RolesPage implements OnInit {
+
   roles: Rol[] = [];
-  rolActual: Rol = { id: '', nombre: '', descripcion: '' };
-  editando = false;
+  rolesFiltrados: Rol[] = [];
+
+  buscar = '';
+
+  // MODALES
+  modalAgregar = false;
+  modalEditar = false;
+  modalEliminar = false;
+  modalLista = false;
+  modalModulos = false;  // 🔥 nuevo modal
+
+  // LISTA DE MODULOS DISPONIBLES
+  listaModulos = [
+    'Usuarios',
+    'Roles',
+    'Entrenamientos',
+    'Inscripciones',
+    'Pagos',
+    'Actividades',
+    'Gastos',
+    'Responsables de Atletas',
+    'Informes'
+  ];
+
+  // Agregar
+  seleccionModulos: string[] = [];
+
+  nuevoRol: Rol = {
+    nombre: '',
+    descripcion: '',
+    AccesoApp: false,
+    Estado: 'Activo',
+    modulos: []
+  };
+
+  // Editar
+  rolEditarId: string | null = null;
+  rolEditar: Rol | null = null;
+
+  // Eliminar
+  rolEliminarId: string | null = null;
 
   constructor(
-    private toastCtrl: ToastController,
-    private alertCtrl: AlertController
+    private rolSrv: RolesService,
+    private toastCtrl: ToastController
   ) {}
 
-  ngOnInit() {
-    this.cargarRoles();
+  async ngOnInit() {
+    await this.listar();
   }
 
-  /** 🔹 Cargar roles desde localStorage */
-  cargarRoles() {
-    const data = localStorage.getItem('roles');
-    this.roles = data ? JSON.parse(data) : [];
+  async listar() {
+    this.roles = await this.rolSrv.listar();
+
+    // Normalizar descripcion (por si viene con tilde)
+    this.roles = this.roles.map(r => ({
+      ...r,
+      descripcion: (r as any).descripcion || (r as any)['descripción'] || '',
+      modulos: r.modulos || []
+    }));
+
+    this.rolesFiltrados = [...this.roles];
   }
 
-  /** 🔹 Guardar roles en localStorage */
-  guardarRoles() {
-    localStorage.setItem('roles', JSON.stringify(this.roles));
+  filtrar() {
+    const t = this.buscar.toLowerCase();
+    this.rolesFiltrados = this.roles.filter(r =>
+      r.nombre.toLowerCase().includes(t) ||
+      (r.descripcion || '').toLowerCase().includes(t)
+    );
   }
 
-  /** 🔹 Agregar o actualizar rol */
-  async guardarRol() {
-    if (!this.rolActual.nombre.trim()) {
-      return this.mostrarToast('Ingrese el nombre del rol', 'warning');
+  // ===========================
+  //      AGREGAR
+  // ===========================
+  abrirAgregar() {
+    this.nuevoRol = {
+      nombre: '',
+      descripcion: '',
+      AccesoApp: false,
+      Estado: 'Activo',
+      modulos: []
+    };
+    this.seleccionModulos = [];
+    this.modalAgregar = true;
+  }
+
+  cerrarAgregar() {
+    this.modalAgregar = false;
+  }
+
+  async guardar() {
+    try {
+      this.nuevoRol.modulos = [...this.seleccionModulos];
+
+      await this.rolSrv.agregar(this.nuevoRol);
+      this.mostrarToast('Rol agregado', 'success');
+      this.modalAgregar = false;
+      await this.listar();
+    } catch (_) {
+      this.mostrarToast('Error al guardar', 'danger');
+    }
+  }
+
+  // ===========================
+  //         EDITAR
+  // ===========================
+  abrirEditar() {
+    this.rolEditarId = null;
+    this.rolEditar = null;
+    this.modalEditar = true;
+  }
+
+  cerrarEditar() {
+    this.modalEditar = false;
+  }
+
+  cargarEditar() {
+    const r = this.roles.find(x => x.id === this.rolEditarId);
+    if (!r) return;
+
+    this.rolEditar = { ...r };
+    this.seleccionModulos = [...(r.modulos || [])];
+  }
+
+  async actualizar() {
+    if (!this.rolEditar || !this.rolEditar.id) return;
+
+    this.rolEditar.modulos = [...this.seleccionModulos];
+
+    try {
+      await this.rolSrv.actualizar(this.rolEditar.id, this.rolEditar);
+      this.mostrarToast('Actualizado', 'success');
+      this.modalEditar = false;
+      await this.listar();
+    } catch (_) {
+      this.mostrarToast('Error al actualizar', 'danger');
+    }
+  }
+
+  // ===========================
+  //        ELIMINAR
+  // ===========================
+  abrirEliminar() {
+    this.rolEliminarId = null;
+    this.modalEliminar = true;
+  }
+
+  cerrarEliminar() {
+    this.modalEliminar = false;
+  }
+
+  async eliminar() {
+    if (!this.rolEliminarId) {
+      this.mostrarToast('Selecciona un rol', 'warning');
+      return;
     }
 
-    if (this.editando) {
-      const idx = this.roles.findIndex(r => r.id === this.rolActual.id);
-      if (idx >= 0) this.roles[idx] = { ...this.rolActual };
-      await this.mostrarToast('Rol actualizado correctamente', 'success');
+    try {
+      await this.rolSrv.eliminar(this.rolEliminarId);
+      this.modalEliminar = false;
+      this.mostrarToast('Eliminado', 'danger');
+      await this.listar();
+    } catch (_) {
+      this.mostrarToast('Error al eliminar', 'danger');
+    }
+  }
+
+  // LISTA -> EDITAR / ELIMINAR
+  editarDesdeLista(r: Rol) {
+    this.modalLista = false;
+    this.modalEditar = true;
+    this.rolEditarId = r.id || null;
+    this.cargarEditar();
+  }
+
+  eliminarDesdeLista(r: Rol) {
+    this.modalLista = false;
+    this.modalEliminar = true;
+    this.rolEliminarId = r.id || null;
+  }
+
+  // ===========================
+  //     MODAL DE MÓDULOS
+  // ===========================
+  toggleModulo(mod: string, ev: any) {
+    if (ev.detail.checked) {
+      if (!this.seleccionModulos.includes(mod)) {
+        this.seleccionModulos.push(mod);
+      }
     } else {
-      this.rolActual.id = Date.now().toString();
-      this.roles.push({ ...this.rolActual });
-      await this.mostrarToast('Rol agregado correctamente', 'success');
+      this.seleccionModulos = this.seleccionModulos.filter(x => x !== mod);
     }
-
-    this.guardarRoles();
-    this.cancelarEdicion();
   }
 
-  /** 🔹 Editar un rol */
-  editarRol(rol: Rol) {
-    this.rolActual = { ...rol };
-    this.editando = true;
+  removeModulo(mod: string) {
+    this.seleccionModulos = this.seleccionModulos.filter(x => x !== mod);
   }
 
-  /** 🔹 Cancelar edición */
-  cancelarEdicion() {
-    this.rolActual = { id: '', nombre: '', descripcion: '' };
-    this.editando = false;
+  confirmarModulos() {
+    if (this.rolEditar) this.rolEditar.modulos = [...this.seleccionModulos];
+    if (this.nuevoRol) this.nuevoRol.modulos = [...this.seleccionModulos];
+
+    this.modalModulos = false;
   }
 
-  /** 🔹 Eliminar un rol */
-  async eliminarRol(rol: Rol) {
-    const alert = await this.alertCtrl.create({
-      header: 'Eliminar Rol',
-      message: `¿Desea eliminar el rol "${rol.nombre}"?`,
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          handler: async () => {
-            this.roles = this.roles.filter(r => r.id !== rol.id);
-            this.guardarRoles();
-            await this.mostrarToast('Rol eliminado', 'danger');
-          },
-        },
-      ],
-    });
-    await alert.present();
-  }
-
-  /** 🔹 Mostrar mensaje */
-  private async mostrarToast(msg: string, color: string) {
-    const toast = await this.toastCtrl.create({
+  // ===========================
+  //         TOAST
+  // ===========================
+  async mostrarToast(msg: string, color: string) {
+    const t = await this.toastCtrl.create({
       message: msg,
       duration: 1500,
-      color,
+      color
     });
-    await toast.present();
+    t.present();
   }
 }

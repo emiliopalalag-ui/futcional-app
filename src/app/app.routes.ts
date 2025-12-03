@@ -1,11 +1,21 @@
 import { Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { AuthService } from './services/auth.service';
+import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
 
   // ======================================================
-  // 🔹 LOGIN (no necesita guard)
+  // 🔹 SIEMPRE ENTRAR A LOGIN
+  // ======================================================
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full'
+  },
+
+  // ======================================================
+  // 🔹 LOGIN SIEMPRE DISPONIBLE
   // ======================================================
   {
     path: 'login',
@@ -14,14 +24,23 @@ export const routes: Routes = [
   },
 
   // ======================================================
-  // 🔹 RUTAS INTERNAS (PROTEGIDAS POR EL GUARD)
+  // 🔹 RUTAS INTERNAS PROTEGIDAS
   // ======================================================
   {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [AuthService],   // 🔥 PROTECCIÓN AQUÍ
+    canActivate: [AuthGuard],
+// protege todo menos login
     children: [
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
+
+      {
+        path: 'informes',
+        // ✔ El usuario logeado va a INFORMES
+        loadComponent: () =>
+          import('./pages/informes/informes.page').then(
+            (m) => m.InformesPage
+          ),
+      },
 
       {
         path: 'home',
@@ -32,13 +51,17 @@ export const routes: Routes = [
       {
         path: 'usuarios',
         loadComponent: () =>
-          import('./pages/usuarios/usuarios.page').then((m) => m.UsuariosPage),
+          import('./pages/usuarios/usuarios.page').then(
+            (m) => m.UsuariosPage
+          ),
       },
 
       {
         path: 'roles',
         loadComponent: () =>
-          import('./pages/roles/roles.page').then((m) => m.RolesPage),
+          import('./pages/roles/roles.page').then(
+            (m) => m.RolesPage
+          ),
       },
 
       {
@@ -66,45 +89,39 @@ export const routes: Routes = [
       },
 
       {
-        path: 'informes',
+        path: 'pagos',
         loadComponent: () =>
-          import('./pages/informes/informes.page').then(
-            (m) => m.InformesPage
+          import('./pages/pagos/pagos.page').then(
+            (m) => m.PagosPage
           ),
       },
 
       {
-        path: 'pagos',
-        loadComponent: () =>
-          import('./pages/pagos/pagos.page').then((m) => m.PagosPage),
-      },
-       {
         path: 'gastos',
         loadComponent: () =>
-          import('./pages/gastos/gastos.page').then((m) => m.GastosPage),
+          import('./pages/gastos/gastos.page').then(
+            (m) => m.GastosPage
+          ),
       },
+
       {
-  path: 'responsables',
-  loadComponent: () => import('./pages/responsables/responsables.page').then(m => m.ResponsablesPage)
-}
+        path: 'responsables',
+        loadComponent: () =>
+          import('./pages/responsables/responsables.page').then(
+            (m) => m.ResponsablesPage
+          ),
+      },
 
     ],
   },
 
   // ======================================================
-  // 🔹 RUTA INVÁLIDA → LOGIN
+  // 🔹 RUTA INVÁLIDA
   // ======================================================
-  { path: '**', redirectTo: 'login', pathMatch: 'full' },
   {
-    path: 'pagos',
-    loadComponent: () => import('./pages/pagos/pagos.page').then( m => m.PagosPage)
+    path: '**',
+    redirectTo: 'login',
+    pathMatch: 'full'
   },
-  {
-    path: 'gastos',
-    loadComponent: () => import('./pages/gastos/gastos.page').then( m => m.GastosPage)
-  },
-  {
-    path: 'responsables',
-    loadComponent: () => import('./pages/responsables/responsables.page').then( m => m.ResponsablesPage)
-  },
+
 ];

@@ -1,0 +1,220 @@
+ion-content {
+  --background: #f4f5f8;
+}
+
+/* KPI pequeñas */
+.kpi-card {
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  text-align: left;
+}
+
+.kpi-card ion-card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.kpi-number {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 4px 0;
+  color: #1a73e8;
+}
+
+.kpi-sub {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+/* Tarjetas de módulos */
+.module-card {
+  border-radius: 14px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.module-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.module-card ion-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* Resumen rápido */
+.summary-card {
+  border-radius: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.summary-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.summary-list li {
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+}
+
+.summary-list li strong {
+  font-weight: 600;
+}
+
+.saldo-positivo {
+  color: #0b8b3b;
+  font-weight: 700;
+}
+
+.saldo-negativo {
+  color: #d93025;
+  font-weight: 700;
+}
+
+/* Encabezado de modal */
+.modal-header {
+  --background: #2a4c7c;
+  --color: #ffffff;
+}
+
+/* Tablas dentro de los modales */
+.table-container {
+  margin-top: 10px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  overflow: auto;
+  max-height: 60vh;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.table-container thead {
+  position: sticky;
+  top: 0;
+  background: #e9eef7;
+  z-index: 1;
+}
+
+.table-container th,
+.table-container td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.table-container th {
+  font-weight: 600;
+  color: #374151;
+}
+
+.table-container tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+.table-container tbody tr:hover {
+  background: #eef3ff;
+}
+
+/* Searchbar y filtros */
+ion-searchbar {
+  --background: #ffffff;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+ion-item {
+  --background: #ffffff;
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+
+/* Botones exportar */
+ion-button[fill="outline"] {
+  margin-top: 8px;
+}
+
+/* Responsivo */
+@media (min-width: 768px) {
+  .kpi-card {
+    margin-bottom: 12px;
+  }
+}
+.kpi-finanzas .positivo {
+  color: #0f8f2f; /* verde */
+}
+
+.kpi-finanzas .negativo {
+  color: #d32f2f; /* rojo */
+}
+
+.kpi-finanzas .ingresos {
+  color: #1b7ced;
+  font-weight: 500;
+}
+
+.kpi-finanzas .gastos {
+  color: #d9534f;
+  font-weight: 500;
+}
+.kpi-inline {
+  display: flex;
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.kpi-mini {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.kpi-mini ion-card-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #444;
+}
+
+.kpi-mini .amount {
+  margin-top: 6px;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.kpi-mini.green {
+  background: #e8f8ef;
+  border-left: 5px solid #2ecc71;
+}
+
+.kpi-mini.red {
+  background: #fdecea;
+  border-left: 5px solid #e74c3c;
+}
+
+.kpi-mini.balance {
+  background: #eef2ff;
+  border-left: 5px solid #4c6ef5;
+}
+
+.positivo {
+  color: #27ae60;
+}
+
+.negativo {
+  color: #c0392b;
+}

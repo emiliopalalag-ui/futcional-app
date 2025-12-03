@@ -1,48 +1,287 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Gestión de Roles</ion-title>
+  </ion-toolbar>
+</ion-header>
+
 <ion-content class="ion-padding">
 
-  <h2>{{ editando ? 'Editar Rol' : 'Agregar Rol' }}</h2>
+  <!-- OPCIONES -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Opciones</ion-card-title>
+    </ion-card-header>
 
-  <ion-item>
-    <ion-label position="floating">Nombre</ion-label>
-    <ion-input [(ngModel)]="rolActual.nombre"></ion-input>
-  </ion-item>
+    <ion-card-content>
 
-  <ion-item>
-    <ion-label position="floating">Descripción</ion-label>
-    <ion-textarea [(ngModel)]="rolActual.descripcion"></ion-textarea>
-  </ion-item>
+      <ion-button expand="block" color="success" (click)="abrirAgregar()">
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Agregar Rol
+      </ion-button>
 
-  <div class="btn-group">
-    <ion-button expand="block" color="primary" (click)="guardarRol()">
-      {{ editando ? 'Actualizar' : 'Guardar' }}
-    </ion-button>
+      <ion-button expand="block" color="warning" (click)="abrirEditar()">
+        <ion-icon name="create-outline" slot="start"></ion-icon>
+        Modificar Rol
+      </ion-button>
 
-    <ion-button expand="block" fill="outline" color="medium" *ngIf="editando" (click)="cancelarEdicion()">
-      Cancelar
-    </ion-button>
-  </div>
+      <ion-button expand="block" color="danger" (click)="abrirEliminar()">
+        <ion-icon name="trash-outline" slot="start"></ion-icon>
+        Eliminar Rol
+      </ion-button>
 
-  <ion-list class="ion-margin-top">
-    <ion-list-header>
-      <ion-label>Roles Registrados</ion-label>
-    </ion-list-header>
+      <ion-button expand="block" color="medium" (click)="modalLista = true">
+        <ion-icon name="list-outline" slot="start"></ion-icon>
+        Listar Roles
+      </ion-button>
 
-    <ion-item *ngFor="let rol of roles">
-      <ion-label>
-        <h2>{{ rol.nombre }}</h2>
-        <p>{{ rol.descripcion }}</p>
-      </ion-label>
+    </ion-card-content>
+  </ion-card>
 
-      <ion-buttons slot="end">
-        <ion-button color="primary" fill="clear" (click)="editarRol(rol)">
-          <ion-icon name="create-outline"></ion-icon>
+  <!-- ========================= MODAL AGREGAR ========================= -->
+
+  <ion-modal [isOpen]="modalAgregar" (willDismiss)="cerrarAgregar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="success">
+          <ion-title>Agregar Rol</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarAgregar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <ion-item>
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input [(ngModel)]="nuevoRol.nombre"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="floating">Descripción</ion-label>
+          <ion-input [(ngModel)]="nuevoRol.descripcion"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Acceso App</ion-label>
+          <ion-toggle [(ngModel)]="nuevoRol.AccesoApp"></ion-toggle>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Estado</ion-label>
+          <ion-select [(ngModel)]="nuevoRol.Estado">
+            <ion-select-option value="Activo">Activo</ion-select-option>
+            <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item button (click)="modalModulos=true">
+          <ion-label>Módulos permitidos</ion-label>
+          <ion-note slot="end">{{ seleccionModulos.length }} seleccionados</ion-note>
+        </ion-item>
+
+        <!-- CHIPS -->
+        <div *ngIf="seleccionModulos.length > 0" class="chips">
+          <ion-chip *ngFor="let m of seleccionModulos">
+            <ion-label>{{ m }}</ion-label>
+            <ion-icon name="close" (click)="removeModulo(m)"></ion-icon>
+          </ion-chip>
+        </div>
+
+        <ion-button expand="block" color="success" (click)="guardar()">
+          Guardar
         </ion-button>
 
-        <ion-button color="danger" fill="clear" (click)="eliminarRol(rol)">
-          <ion-icon name="trash-outline"></ion-icon>
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+  <!-- ========================= MODAL EDITAR ========================= -->
+
+  <ion-modal [isOpen]="modalEditar" (willDismiss)="cerrarEditar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="warning">
+          <ion-title>Modificar Rol</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarEditar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <ion-item>
+          <ion-label>Seleccionar Rol</ion-label>
+          <ion-select [(ngModel)]="rolEditarId" (ionChange)="cargarEditar()">
+            <ion-select-option *ngFor="let r of roles" [value]="r.id">
+              {{ r.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ng-container *ngIf="rolEditar">
+
+          <ion-item>
+            <ion-label position="floating">Nombre</ion-label>
+            <ion-input [(ngModel)]="rolEditar.nombre"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="floating">Descripción</ion-label>
+            <ion-input [(ngModel)]="rolEditar.descripcion"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Acceso App</ion-label>
+            <ion-toggle [(ngModel)]="rolEditar.AccesoApp"></ion-toggle>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Estado</ion-label>
+            <ion-select [(ngModel)]="rolEditar.Estado">
+              <ion-select-option value="Activo">Activo</ion-select-option>
+              <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-item button (click)="modalModulos=true">
+            <ion-label>Módulos permitidos</ion-label>
+            <ion-note slot="end">{{ seleccionModulos.length }} seleccionados</ion-note>
+          </ion-item>
+
+          <div class="chips">
+            <ion-chip *ngFor="let m of seleccionModulos">
+              <ion-label>{{ m }}</ion-label>
+              <ion-icon name="close" (click)="removeModulo(m)"></ion-icon>
+            </ion-chip>
+          </div>
+
+          <ion-button expand="block" color="warning" (click)="actualizar()">
+            Actualizar
+          </ion-button>
+
+        </ng-container>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+  <!-- ========================= MODAL ELIMINAR ========================= -->
+
+  <ion-modal [isOpen]="modalEliminar" (willDismiss)="cerrarEliminar()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="danger">
+          <ion-title>Eliminar Rol</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarEliminar()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <ion-item>
+          <ion-label>Seleccionar Rol</ion-label>
+          <ion-select [(ngModel)]="rolEliminarId">
+            <ion-select-option *ngFor="let r of roles" [value]="r.id">
+              {{ r.nombre }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-button expand="block" color="danger" (click)="eliminar()">
+          Eliminar
         </ion-button>
-      </ion-buttons>
-    </ion-item>
-  </ion-list>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+  <!-- ========================= MODAL LISTA ========================= -->
+
+  <ion-modal [isOpen]="modalLista" (willDismiss)="modalLista=false">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="medium">
+          <ion-title>Lista de Roles</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="modalLista=false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <ion-list>
+          <ion-item *ngFor="let r of roles">
+            <ion-label>
+              <h2>{{ r.nombre }}</h2>
+              <p>{{ r.descripcion }}</p>
+              <p><strong>Modulos:</strong> {{ r.modulos?.join(', ') }}</p>
+              <p>Acceso: {{ r.AccesoApp ? 'Sí' : 'No' }}</p>
+              <p>Estado: {{ r.Estado }}</p>
+            </ion-label>
+
+            <ion-button color="warning" (click)="editarDesdeLista(r)">
+              <ion-icon name="create-outline"></ion-icon>
+            </ion-button>
+
+            <ion-button color="danger" (click)="eliminarDesdeLista(r)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+
+          </ion-item>
+        </ion-list>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+  <!-- ========================= MODAL SELECCCION MODULOS ========================= -->
+
+  <ion-modal [isOpen]="modalModulos" (willDismiss)="modalModulos=false">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Seleccionar módulos</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="modalModulos=false">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <ion-list>
+          <ion-item *ngFor="let m of listaModulos">
+            <ion-checkbox
+              slot="start"
+              [checked]="seleccionModulos.includes(m)"
+              (ionChange)="toggleModulo(m, $event)"
+            ></ion-checkbox>
+
+            <ion-label>{{ m }}</ion-label>
+          </ion-item>
+        </ion-list>
+
+        <ion-button expand="block" color="success" (click)="confirmarModulos()">
+          Aceptar selección
+        </ion-button>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
 
 </ion-content>

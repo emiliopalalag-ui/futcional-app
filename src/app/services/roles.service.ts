@@ -1,32 +1,72 @@
 import { Injectable } from '@angular/core';
-import { Firestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from '@angular/fire/firestore';
-export interface Rol { id?: string; nombre: string; descripcion?: string; }
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  addDoc,
+  setDoc,
+  deleteDoc,
+  getDoc,
+} from 'firebase/firestore';
+
+export interface Rol {
+  id?: string;
+  nombre: string;
+  descripcion: string;
+  AccesoApp: boolean;
+  Estado: string;
+  modulos?: string[]; // 🔥 NUEVO
+}
+
 
 @Injectable({ providedIn: 'root' })
 export class RolesService {
-  private collectionName = 'roles';
 
-  constructor(private firestore: Firestore) {}
+  private db = getFirestore();
+  private col = collection(this.db, 'roles');
 
-  async listarRoles() {
-    const querySnapshot = await getDocs(collection(this.firestore, this.collectionName));
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+  // =============================
+  // 🔹 LISTAR
+  // =============================
+  async listar(): Promise<Rol[]> {
+    const snap = await getDocs(this.col);
+
+    return snap.docs.map(d => ({
+      id: d.id,
+      ...(d.data() as any)
+    })) as Rol[];
   }
 
-  async agregarRol(rol: any) {
-    await addDoc(collection(this.firestore, this.collectionName), rol);
+  // =============================
+  // 🔹 AGREGAR (ESTÁNDAR SISTEMA)
+  // =============================
+  async agregar(rol: Omit<Rol, 'id'>) {
+    await addDoc(this.col, rol);
   }
 
-  async modificarRol(id: string, data: any) {
-    const ref = doc(this.firestore, `${this.collectionName}/${id}`);
-    await updateDoc(ref, data);
+  // =============================
+  // 🔹 OBTENER POR ID
+  // =============================
+  async obtener(id: string): Promise<Rol | null> {
+    const ref = doc(this.db, 'roles', id);
+    const snap = await getDoc(ref);
+    return snap.exists() ? { id: snap.id, ...(snap.data() as any) } : null;
   }
 
-  async eliminarRol(id: string) {
-    const ref = doc(this.firestore, `${this.collectionName}/${id}`);
+  // =============================
+  // 🔹 ACTUALIZAR
+  // =============================
+  async actualizar(id: string, data: Partial<Rol>) {
+    const ref = doc(this.db, 'roles', id);
+    await setDoc(ref, data, { merge: true });
+  }
+
+  // =============================
+  // 🔹 ELIMINAR
+  // =============================
+  async eliminar(id: string) {
+    const ref = doc(this.db, 'roles', id);
     await deleteDoc(ref);
   }
 }

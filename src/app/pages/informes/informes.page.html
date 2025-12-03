@@ -1,13 +1,750 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>informes</ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Panel de Informes</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">informes</ion-title>
-    </ion-toolbar>
-  </ion-header>
-</ion-content>
+<ion-content class="ion-padding">
+
+  <!-- ========================================================= -->
+  <!--                KPI — TARJETAS RESUMEN PEQUEÑAS            -->
+  <!-- ========================================================= -->
+
+  <ion-grid>
+    <ion-row>
+
+      <ion-col size="12" size-md="4">
+        <ion-card class="kpi-card">
+          <ion-card-title>Usuarios</ion-card-title>
+          <p class="kpi-number">{{ totalUsuarios }}</p>
+          <p class="kpi-sub">
+            🏃 Atletas: {{ totalAtletas }} · 🎓 Entrenadores: {{ totalEntrenadores }}
+            · 🛡️ Administradores: {{ totalAdministradores }}
+            · 👨‍👧 Padres/Responsables: {{ totalPadres }}
+          </p>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="12" size-md="4">
+        <ion-card class="kpi-card">
+          <ion-card-title>Inscripciones</ion-card-title>
+          <p class="kpi-number">{{ totalInscripcionesActivas }}</p>
+          <p class="kpi-sub">
+            Entrenamientos: {{ totalEntrenamientos }}
+          </p>
+        </ion-card>
+      </ion-col>
+
+      <ion-col size="12" size-md="4">
+        <ion-card class="kpi-card kpi-finanzas">
+          <ion-card-title>Finanzas</ion-card-title>
+
+          <p class="kpi-number" [ngClass]="saldoNeto >= 0 ? 'positivo' : 'negativo'">
+            Bs {{ saldoNeto | number:'1.2-2' }}
+          </p>
+
+          <p class="kpi-sub">
+            <span class="ingresos">Ingresos: +{{ totalPagosMonto | number:'1.0-0' }}</span>
+            ·
+            <span class="gastos">Gastos: -{{ totalGastosMonto | number:'1.0-0' }}</span>
+          </p>
+        </ion-card>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+
+  <!-- ========================================================= -->
+  <!--       LAYOUT PRINCIPAL MITAD-MITAD (MÓDULOS + RESUMEN)    -->
+  <!-- ========================================================= -->
+
+  <ion-grid>
+    <ion-row>
+
+      <!-- TARJETAS DE MÓDULOS -->
+      <ion-col size="12" size-md="6">
+        <ion-grid>
+          <ion-row>
+
+            <ion-col size="12" size-md="6">
+              <ion-card button (click)="abrirUsuarios()" class="module-card">
+                <ion-card-header>
+                  <ion-card-title>Usuarios</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  Informe de personas registradas (atletas, entrenadores, admins, padres).
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+            <ion-col size="12" size-md="6">
+              <ion-card button (click)="abrirEntrenamientos()" class="module-card">
+                <ion-card-header>
+                  <ion-card-title>Entrenamientos</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  Disciplinas, horarios, días y estado.
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+            <ion-col size="12" size-md="6">
+              <ion-card button (click)="abrirInscripciones()" class="module-card">
+                <ion-card-header>
+                  <ion-card-title>Inscripciones</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  Relación Atleta – Entrenamiento, fechas y estado.
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+            <ion-col size="12" size-md="6">
+              <ion-card button (click)="abrirPagos()" class="module-card">
+                <ion-card-header>
+                  <ion-card-title>Pagos</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  Historial de pagos por periodo, método y atleta.
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+            <ion-col size="12" size-md="6">
+              <ion-card button (click)="abrirActividades()" class="module-card">
+                <ion-card-header>
+                  <ion-card-title>Actividades</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  Eventos y actividades asociadas a entrenamientos.
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+            <ion-col size="12" size-md="6">
+              <ion-card button (click)="abrirGastos()" class="module-card">
+                <ion-card-header>
+                  <ion-card-title>Gastos</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  Control de egresos por actividad, fecha y estado.
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+            <ion-col size="12" size-md="6">
+              <ion-card button (click)="abrirResponsables()" class="module-card">
+                <ion-card-header>
+                  <ion-card-title>Responsables</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  Padres / Responsables vinculados a atletas.
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+
+          </ion-row>
+        </ion-grid>
+      </ion-col>
+
+      <!-- RESUMEN RÁPIDO -->
+      <ion-col size="12" size-md="6">
+        <ion-card class="summary-card">
+          <ion-card-header>
+            <ion-card-title>Resumen rápido</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ul class="summary-list">
+              <li><strong>Usuarios registrados:</strong> {{ totalUsuarios }}</li>
+              <li><strong>Entrenamientos registrados:</strong> {{ totalEntrenamientos }}</li>
+              <li><strong>Inscripciones activas:</strong> {{ totalInscripcionesActivas }}</li>
+              <li><strong>Ingresos acumulados:</strong> Bs {{ totalPagosMonto | number:'1.2-2' }}</li>
+              <li><strong>Gastos acumulados:</strong> Bs {{ totalGastosMonto | number:'1.2-2' }}</li>
+              <li>
+                <strong>Saldo neto estimado:</strong>
+                <span [ngClass]="saldoNeto >= 0 ? 'saldo-positivo' : 'saldo-negativo'">
+                  Bs {{ saldoNeto | number:'1.2-2' }}
+                </span>
+              </li>
+            </ul>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+
+  <!-- ========================================================= -->
+  <!--                         MODALES                           -->
+  <!-- ========================================================= -->
+
+  <!-- ===================== USUARIOS ===================== -->
+  <ion-modal [isOpen]="modalUsuarios" (willDismiss)="cerrarUsuarios()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar class="modal-header">
+          <ion-title>Informe de Usuarios</ion-title>
+          <ion-buttons slot="end">
+            <ion-button color="light" (click)="cerrarUsuarios()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <div id="pdf-usuarios">
+
+          <ion-searchbar placeholder="Buscar por nombre o carnet..." [(ngModel)]="filtroUsrTexto"></ion-searchbar>
+
+          <ion-grid>
+            <ion-row>
+              <ion-col size="6">
+                <ion-item>
+                  <ion-label>Rol</ion-label>
+                  <ion-select [(ngModel)]="filtroUsrRol">
+                    <ion-select-option value="">Todos</ion-select-option>
+                    <ion-select-option value="Atleta">Atleta</ion-select-option>
+                    <ion-select-option value="Entrenador">Entrenador</ion-select-option>
+                    <ion-select-option value="Administrador">Administrador</ion-select-option>
+                    <ion-select-option value="Padre o Responsable">Padre/Responsable</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+
+              <ion-col size="6">
+                <ion-item>
+                  <ion-label>Estado</ion-label>
+                  <ion-select [(ngModel)]="filtroUsrEstado">
+                    <ion-select-option value="">Todos</ion-select-option>
+                    <ion-select-option value="Activo">Activo</ion-select-option>
+                    <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Carnet</th>
+                  <th>Nombre</th>
+                  <th>Rol</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let u of usuariosFiltrados">
+                  <td>{{ u.carnet }}</td>
+                  <td>{{ u.nombre }} {{ u.apellido }}</td>
+                  <td>{{ u.rol }}</td>
+                  <td>{{ u.estado }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <ion-button expand="block" shape="round" fill="outline" color="primary"
+          (click)="exportarSeccionPdf('pdf-usuarios','Informe_Usuarios')">
+          <ion-icon slot="start" name="download-outline"></ion-icon>
+          Exportar PDF
+        </ion-button>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+
+
+  <!-- ===================== ENTRENAMIENTOS ===================== -->
+
+  <ion-modal [isOpen]="modalEntrenamientos" (willDismiss)="cerrarEntrenamientos()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar class="modal-header">
+          <ion-title>Entrenamientos</ion-title>
+          <ion-buttons slot="end">
+            <ion-button color="light" (click)="cerrarEntrenamientos()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <div id="pdf-entrenamientos">
+
+          <ion-searchbar placeholder="Buscar por nombre o descripción..." [(ngModel)]="filtroEntTexto"></ion-searchbar>
+
+          <ion-item>
+            <ion-label>Estado</ion-label>
+            <ion-select [(ngModel)]="filtroEntEstado">
+              <ion-select-option value="">Todos</ion-select-option>
+              <ion-select-option value="Activo">Activo</ion-select-option>
+              <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre</th>
+                  <th>Horario</th>
+                  <th>Días</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of entrenamientosFiltrados">
+                  <td>{{ e.nombre }}</td>
+                  <td>{{ e.horario }}</td>
+                  <td>{{ e.dias }}</td>
+                  <td>{{ e.estado }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <ion-button expand="block" shape="round" fill="outline" color="primary"
+          (click)="exportarSeccionPdf('pdf-entrenamientos','Informe_Entrenamientos')">
+          <ion-icon slot="start" name="download-outline"></ion-icon>
+          Exportar PDF
+        </ion-button>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+
+
+  <!-- ===================== INSCRIPCIONES ===================== -->
+
+  <ion-modal [isOpen]="modalInscripciones" (willDismiss)="cerrarInscripciones()">
+    <ng-template>
+
+      <ion-header>
+        <ion-toolbar class="modal-header">
+          <ion-title>Inscripciones</ion-title>
+          <ion-buttons slot="end">
+            <ion-button color="light" (click)="cerrarInscripciones()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+
+        <div id="pdf-inscripciones">
+
+          <ion-searchbar placeholder="Buscar por atleta o entrenamiento..." [(ngModel)]="filtroInscTexto"></ion-searchbar>
+
+          <ion-grid>
+            <ion-row>
+              <ion-col size="6">
+                <ion-item>
+                  <ion-label>Entrenamiento</ion-label>
+                  <ion-select [(ngModel)]="filtroInscEntrenamiento">
+                    <ion-select-option value="">Todos</ion-select-option>
+                    <ion-select-option *ngFor="let e of entrenamientos" [value]="e.id">{{ e.nombre }}</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+              <ion-col size="6">
+                <ion-item>
+                  <ion-label>Estado</ion-label>
+                  <ion-select [(ngModel)]="filtroInscEstado">
+                    <ion-select-option value="">Todos</ion-select-option>
+                    <ion-select-option value="Activo">Activo</ion-select-option>
+                    <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+                    <ion-select-option value="Suspendido">Suspendido</ion-select-option>
+                  </ion-select>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Atleta</th>
+                  <th>Entrenamiento</th>
+                  <th>Inicio</th>
+                  <th>Fin</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let i of inscripcionesFiltradas">
+                  <td>{{ i.nombreAtleta }}</td>
+                  <td>{{ i.nombreEntrenamiento }}</td>
+                  <td>{{ i.fecha_inicio | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ i.fecha_fin | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ i.estado }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+
+        <ion-button expand="block" shape="round" fill="outline" color="primary"
+          (click)="exportarSeccionPdf('pdf-inscripciones','Informe_Inscripciones')">
+          <ion-icon slot="start" name="download-outline"></ion-icon>
+          Exportar PDF
+        </ion-button>
+
+      </ion-content>
+
+    </ng-template>
+  </ion-modal>
+
+<!-- ===================== PAGOS ===================== -->
+<ion-modal [isOpen]="modalPagos" (willDismiss)="cerrarPagos()">
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar class="modal-header">
+        <ion-title>Informe de Pagos</ion-title>
+        <ion-buttons slot="end">
+          <ion-button color="light" (click)="cerrarPagos()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+
+      <!-- CONTENEDOR PDF -->
+      <div id="pdf-pagos">
+
+        <!-- KPI TRIPLE -->
+        <div class="kpi-inline">
+
+          <ion-card class="kpi-mini green">
+            <ion-card-title>Ingresos filtrados</ion-card-title>
+            <p class="amount">Bs {{ totalPagosFiltrados | number:'1.2-2' }}</p>
+          </ion-card>
+
+          <ion-card class="kpi-mini red">
+            <ion-card-title>Gastos filtrados</ion-card-title>
+            <p class="amount">Bs {{ totalGastosFiltrados | number:'1.2-2' }}</p>
+          </ion-card>
+
+          <ion-card class="kpi-mini blue">
+            <ion-card-title>Saldo</ion-card-title>
+            <p class="amount">Bs {{ saldoFiltrado | number:'1.2-2' }}</p>
+          </ion-card>
+
+        </div>
+
+        <ion-searchbar
+          placeholder="Buscar por atleta, entrenamiento o ID..."
+          [(ngModel)]="filtroPagTexto">
+        </ion-searchbar>
+
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>Mes</ion-label>
+                <ion-select [(ngModel)]="filtroPagMes">
+                  <ion-select-option value="">Todos</ion-select-option>
+                  <ion-select-option *ngFor="let m of mesesAbreviados" [value]="m">{{ m }}</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>Año</ion-label>
+                <ion-select [(ngModel)]="filtroPagAnio">
+                  <ion-select-option value="">Todos</ion-select-option>
+                  <ion-select-option *ngFor="let y of [2023,2024,2025,2026]" [value]="y.toString()">{{ y }}</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="12">
+              <ion-item>
+                <ion-label>Método</ion-label>
+                <ion-select [(ngModel)]="filtroPagMetodo">
+                  <ion-select-option value="">Todos</ion-select-option>
+                  <ion-select-option value="Efectivo">Efectivo</ion-select-option>
+                  <ion-select-option value="Transferencia">Transferencia</ion-select-option>
+                  <ion-select-option value="Tarjeta">Tarjeta</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <ion-button expand="block" fill="clear" color="medium"
+          (click)="limpiarFiltrosPagos()">
+          LIMPIAR FILTROS
+        </ion-button>
+
+        <!-- Tabla Pagos -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Atleta</th>
+                <th>Entrenamiento</th>
+                <th>Monto</th>
+                <th>Fecha Pago</th>
+                <th>Método</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of pagosFiltrados">
+                <td>{{ p.nombreAtleta }}</td>
+                <td>{{ p.nombreEntrenamiento }}</td>
+                <td><strong>Bs {{ p.monto }}</strong></td>
+                <td>{{ p.fecha_pago | date:'dd/MM/yyyy' }}</td>
+                <td>{{ p.metodo_pago }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- BOTÓN PDF -->
+      <ion-button expand="block" shape="round" fill="outline" color="primary"
+        (click)="exportarSeccionPdf('pdf-pagos','Informe_Pagos')">
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Exportar PDF
+      </ion-button>
+
+    </ion-content>
+
+  </ng-template>
+</ion-modal>
+<!-- ===================== GASTOS ===================== -->
+<ion-modal [isOpen]="modalGastos" (willDismiss)="cerrarGastos()">
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar class="modal-header">
+        <ion-title>Informe de Gastos</ion-title>
+        <ion-buttons slot="end">
+          <ion-button color="light" (click)="cerrarGastos()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+
+      <div id="pdf-gastos">
+
+        <div class="kpi-inline">
+          <ion-card class="kpi-mini green">
+            <ion-card-title>Ingresos filtrados</ion-card-title>
+            <p class="amount">Bs {{ totalPagosFiltrados | number:'1.2-2' }}</p>
+          </ion-card>
+
+          <ion-card class="kpi-mini red">
+            <ion-card-title>Gastos filtrados</ion-card-title>
+            <p class="amount">Bs {{ totalGastosFiltrados | number:'1.2-2' }}</p>
+          </ion-card>
+
+          <ion-card class="kpi-mini blue">
+            <ion-card-title>Saldo</ion-card-title>
+            <p class="amount">Bs {{ saldoFiltrado | number:'1.2-2' }}</p>
+          </ion-card>
+        </div>
+
+        <ion-searchbar
+          placeholder="Buscar descripción u observación..."
+          [(ngModel)]="filtroGasTexto">
+        </ion-searchbar>
+
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>Mes</ion-label>
+                <ion-select [(ngModel)]="filtroGasMes">
+                  <ion-select-option value="">Todos</ion-select-option>
+                  <ion-select-option *ngFor="let m of mesesAbreviados" [value]="m">{{ m }}</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>Año</ion-label>
+                <ion-select [(ngModel)]="filtroGasAnio">
+                  <ion-select-option value="">Todos</ion-select-option>
+                  <ion-select-option *ngFor="let y of [2023,2024,2025,2026]" [value]="y.toString()">{{ y }}</ion-select-option>
+                </ion-select>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+
+        <ion-button expand="block" fill="clear" color="medium"
+          (click)="limpiarFiltrosGastos()">
+          LIMPIAR FILTROS
+        </ion-button>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Descripción</th>
+                <th>Monto</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let g of gastosFiltrados">
+                <td>{{ g.descripcion }}</td>
+                <td><strong>Bs {{ g.monto }}</strong></td>
+                <td>{{ g.fecha | date:'dd/MM/yyyy' }}</td>
+                <td>{{ g.estado }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <ion-button expand="block" shape="round" fill="outline" color="primary"
+        (click)="exportarSeccionPdf('pdf-gastos','Informe_Gastos')">
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Exportar PDF
+      </ion-button>
+
+    </ion-content>
+
+  </ng-template>
+</ion-modal>
+<!-- ===================== ACTIVIDADES ===================== -->
+<ion-modal [isOpen]="modalActividades" (willDismiss)="cerrarActividades()">
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar class="modal-header">
+        <ion-title>Actividades</ion-title>
+        <ion-buttons slot="end">
+          <ion-button color="light" (click)="cerrarActividades()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+
+      <div id="pdf-actividades">
+
+        <ion-searchbar
+          placeholder="Buscar por nombre o descripción..."
+          [(ngModel)]="filtroActTexto">
+        </ion-searchbar>
+
+        <ion-item>
+          <ion-label>Estado</ion-label>
+          <ion-select [(ngModel)]="filtroActEstado">
+            <ion-select-option value="">Todos</ion-select-option>
+            <ion-select-option value="Activo">Activo</ion-select-option>
+            <ion-select-option value="Inactivo">Inactivo</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of actividadesFiltradas">
+                <td>{{ a.nombre }}</td>
+                <td>{{ a.descripcion }}</td>
+                <td>{{ a.fecha | date:'dd/MM/yyyy' }}</td>
+                <td>{{ a.estado }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <ion-button expand="block" shape="round" fill="outline" color="primary"
+        (click)="exportarSeccionPdf('pdf-actividades','Informe_Actividades')">
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Exportar PDF
+      </ion-button>
+
+    </ion-content>
+
+  </ng-template>
+</ion-modal>
+<!-- ===================== RESPONSABLES ===================== -->
+<ion-modal [isOpen]="modalResponsables" (willDismiss)="cerrarResponsables()">
+  <ng-template>
+
+    <ion-header>
+      <ion-toolbar class="modal-header">
+        <ion-title>Responsables</ion-title>
+        <ion-buttons slot="end">
+          <ion-button color="light" (click)="cerrarResponsables()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content class="ion-padding">
+
+      <div id="pdf-responsables">
+
+        <ion-searchbar
+          placeholder="Buscar por responsable, atleta o parentesco..."
+          [(ngModel)]="filtroRespTexto">
+        </ion-searchbar>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Responsable</th>
+                <th>Atleta</th>
+                <th>Parentesco</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of responsablesFiltrados">
+                <td>{{ r.nombreResponsable }}</td>
+                <td>{{ r.nombreAtleta }}</td>
+                <td>{{ r.parentesco }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <ion-button expand="block" shape="round" fill="outline" color="primary"
+        (click)="exportarSeccionPdf('pdf-responsables','Informe_Responsables')">
+        <ion-icon slot="start" name="download-outline"></ion-icon>
+        Exportar PDF
+      </ion-button>
+
+    </ion-content>
+
+  </ng-template>
+</ion-modal>

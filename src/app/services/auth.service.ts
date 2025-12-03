@@ -1,83 +1,94 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, query, where, getDocs } from '@angular/fire/firestore';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { Router } from '@angular/router';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  constructor(private firestore: Firestore) {}
+  private auth = getAuth();
+  private isLogged = false;
+  private userLoaded = false;
 
+  constructor(private firestore: Firestore, private router: Router) {
+
+    // Detectar sesión apenas inicia la app
+    onAuthStateChanged(this.auth, (user) => {
+      this.isLogged = !!user;
+
+      if (user) {
+        const uLS = localStorage.getItem('usuario');
+        if (!uLS) {
+          localStorage.setItem('usuario', JSON.stringify({
+            uid: user.uid,
+            email: user.email
+          }));
+        }
+      }
+
+      this.userLoaded = true;
+    });
+  }
+
+  // ================================
+  // LOGIN
+  // ================================
   async login(email: string, password: string): Promise<any> {
-    const auth = getAuth();
+    const cred = await signInWithEmailAndPassword(this.auth, email, password);
 
-    // 1️⃣ LOGIN EN FIREBASE AUTH
-    const cred = await signInWithEmailAndPassword(auth, email, password);
-
-    if (!cred.user.email) {
-      throw new Error('El usuario no tiene correo válido');
-    }
-
-    // 2️⃣ BUSCAR USUARIO EN FIRESTORE
     const usuariosRef = collection(this.firestore, 'usuarios');
     const q = query(usuariosRef, where('correo', '==', email));
     const snap = await getDocs(q);
 
-    if (snap.empty) {
-      throw new Error('El usuario no existe en la base de datos');
-    }
+    if (snap.empty) throw new Error('Usuario no encontrado');
 
     const data = snap.docs[0].data();
 
-    // 3️⃣ RETORNAR DATOS COMPLETOS AL LOGIN
-    return {
+    const usuario = {
       uid: cred.user.uid,
       email: cred.user.email,
-      nombre: data['nombre'],
-      apellido: data['apellido'],
-      rol: data['rol'],
-      carnet: data['carnet'],
-      estado: data['estado'],
-      telefono: data['telefono'],
-      fecha_nacimiento: data['fecha_nacimiento'],
-      genero: data['genero'],
       ...data
     };
+
+    localStorage.setItem('usuario', JSON.stringify(usuario));
+    this.isLogged = true;
+
+    return usuario;
   }
-  // =======================================================
-// 🔒 VERIFICAR SI HAY SESIÓN ACTIVA
-// =======================================================
-isLoggedIn(): boolean {
-  const user = localStorage.getItem('usuario');
-  return user !== null;
-}
 
-// =======================================================
-// 🔒 OBTENER USUARIO ACTUAL
-// =======================================================
-getUsuarioActual(): any {
-  const u = localStorage.getItem('usuario');
-  return u ? JSON.parse(u) : null;
-}
+  // ================================
+  // VERIFICAR SESIÓN
+  // ================================
+  isLoggedIn(): boolean {
+    return this.isLogged && localStorage.getItem('usuario') !== null;
+  }
 
-// =======================================================
-// 🔒 CERRAR SESIÓN DESDE EL SERVICE
-// =======================================================
-logout() {
-  localStorage.removeItem('usuario');
-  const auth = getAuth();
-  auth.signOut();
-}
-// =======================================================
-// 🔥 GUARD PARA PROTEGER RUTAS
-// =======================================================
-canActivate(): boolean {
-  if (this.isLoggedIn()) {
+  getUsuarioActual(): any {
+    const u = localStorage.getItem('usuario');
+    return u ? JSON.parse(u) : null;
+  }
+
+  // ================================
+  // LOGOUT
+  // ================================
+  logout() {
+    localStorage.removeItem('usuario');
+    this.auth.signOut();
+    this.isLogged = false;
+    this.router.navigate(['/login']);
+  }
+
+  // ================================
+  // GUARD
+  // ================================
+  canActivate(): boolean {
+    if (!this.userLoaded) return false;
+
+    if (!this.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return false;
+    }
+
     return true;
   }
-  window.location.href = '/login';
-  return false;
-}
-
 }
